@@ -1,7 +1,8 @@
+import 'package:clear_diary/screens/preferences.dart';
 import 'package:clear_diary/values/strings.dart';
 import 'package:flutter/material.dart';
 
-class HomeScreen extends StatelessWidget {
+class Home extends StatelessWidget {
   static const String id = 'home_screen';
 
   @override
@@ -49,7 +50,9 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
         IconButton(
           icon: const Icon(Icons.settings),
           tooltip: Strings.settings,
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pushNamed(context, Preferences.id);
+          },
         ),
       ],
     );

@@ -1,6 +1,6 @@
 # clear_diary
 
-A diary app, made in Flutter.
+A diary app, made in Flutter. For mostly learning purposes.
 
 # todo list
 - Everything

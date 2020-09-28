@@ -1,7 +1,15 @@
-import 'package:clear_diary/screens/home_screen.dart';
+import 'package:clear_diary/screens/home.dart';
+import 'package:clear_diary/screens/preferences.dart';
 import 'package:flutter/material.dart';
+import 'package:preferences/preferences.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await PrefService.init(prefix: 'pref_');
+
+  PrefService.setDefaultValues({'user_description': 'This is my description!'});
+
   runApp(DiaryApp());
 }
 
@@ -14,9 +22,10 @@ class DiaryApp extends StatelessWidget {
         primarySwatch: Colors.teal,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      initialRoute: HomeScreen.id,
+      initialRoute: Home.id,
       routes: {
-        HomeScreen.id: (context) => HomeScreen(),
+        Home.id: (context) => Home(),
+        Preferences.id: (context) => Preferences(),
       },
     );
   }
