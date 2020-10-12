@@ -1,3 +1,4 @@
+import 'package:clear_diary/screens/diary_entry.dart';
 import 'package:clear_diary/screens/home.dart';
 import 'package:clear_diary/screens/preferences.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +27,7 @@ class DiaryApp extends StatelessWidget {
       routes: {
         Home.id: (context) => Home(),
         Preferences.id: (context) => Preferences(),
+        DiaryEntry.id: (context) => DiaryEntry(),
       },
     );
   }

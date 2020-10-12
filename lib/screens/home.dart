@@ -1,3 +1,4 @@
+import 'package:clear_diary/screens/diary_entry.dart';
 import 'package:clear_diary/screens/preferences.dart';
 import 'package:clear_diary/values/strings.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +12,9 @@ class Home extends StatelessWidget {
       appBar: HomeAppBar(),
       body: HomeBody(),
       floatingActionButton: FloatingActionButton(
-        onPressed: null,
+        onPressed: () {
+          Navigator.pushNamed(context, DiaryEntry.id);
+        },
         tooltip: Strings.addEntry,
         child: Icon(Icons.add),
       ),
