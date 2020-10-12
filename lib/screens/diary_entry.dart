@@ -1,9 +1,9 @@
 import 'package:clear_diary/values/strings.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_tagging/flutter_tagging.dart' as Tagging;
 import 'package:intl/intl.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:flutter_tagging/flutter_tagging.dart';
 
 class DiaryEntry extends StatelessWidget {
   static const String id = 'diary_entry_screen';
@@ -29,8 +29,6 @@ class DiaryEntryBody extends StatefulWidget {
 class _DiaryEntryBodyState extends State<DiaryEntryBody> {
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
 
-  var options = ["Option 1", "Option 2", "Option 3"];
-
   final String entryDateKey = 'entry_date';
   final String entryTitleKey = 'entry_title';
   final String entryTagsKey = 'entry_tags';
@@ -39,6 +37,7 @@ class _DiaryEntryBodyState extends State<DiaryEntryBody> {
   @override
   Widget build(BuildContext context) {
     return ListView(
+      padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
       children: <Widget>[
         FormBuilder(
           key: _fbKey,
@@ -57,9 +56,7 @@ class _DiaryEntryBodyState extends State<DiaryEntryBody> {
               FormBuilderTextField(
                 attribute: entryTitleKey,
                 decoration: InputDecoration(labelText: Strings.entryTitle),
-                validators: [
-                  FormBuilderValidators.maxLength(240),
-                ],
+                validators: [],
               ),
               FormBuilderCustomField(
                 attribute: entryTagsKey,
@@ -67,26 +64,14 @@ class _DiaryEntryBodyState extends State<DiaryEntryBody> {
                 formField: FormField(
                   enabled: true,
                   builder: (FormFieldState<dynamic> field) {
-                    return InputDecorator(
-                      decoration: InputDecoration(
-                        labelText: "Select option",
-                        contentPadding: EdgeInsets.only(top: 10.0, bottom: 0.0),
-                        border: InputBorder.none,
-                        errorText: field.errorText,
-                      ),
-                      child: Container(
-                        height: 200,
-                        child: CupertinoPicker(
-                          itemExtent: 30,
-                          children: options.map((c) => Text(c)).toList(),
-                          onSelectedItemChanged: (index) {
-                            field.didChange(options[index]);
-                          },
-                        ),
-                      ),
-                    );
+                    return TextFieldTags();
                   },
                 ),
+              ),
+              FormBuilderTextField(
+                attribute: entryBodyKey,
+                decoration: InputDecoration(labelText: Strings.entryText),
+                validators: [],
               ),
             ],
           ),
@@ -97,7 +82,9 @@ class _DiaryEntryBodyState extends State<DiaryEntryBody> {
               child: Text("Submit"),
               onPressed: () {
                 if (_fbKey.currentState.saveAndValidate()) {
-                  print(_fbKey.currentState.value);
+                  var teste = _fbKey.currentState.value[entryDateKey];
+                  print(teste.runtimeType.toString());
+                  print(teste);
                 }
               },
             ),
@@ -110,6 +97,93 @@ class _DiaryEntryBodyState extends State<DiaryEntryBody> {
           ],
         )
       ],
+    );
+  }
+}
+
+///TODO: Limpar esse text tags
+class TextFieldTags extends StatefulWidget {
+  @override
+  _TextFieldTagsState createState() => _TextFieldTagsState();
+}
+
+class _TextFieldTagsState extends State<TextFieldTags> {
+  String _selectedValuesJson = 'Nothing to show';
+
+  List<Language> _selectedLanguages;
+
+  @override
+  void initState() {
+    _selectedLanguages = [];
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _selectedLanguages.clear();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Tagging.FlutterTagging<Language>(
+      initialItems: _selectedLanguages,
+      textFieldConfiguration: Tagging.TextFieldConfiguration(
+        decoration: InputDecoration(
+          border: InputBorder.none,
+          filled: true,
+          fillColor: Colors.green.withAlpha(30),
+          hintText: 'Search Tags',
+          labelText: 'Select Tags',
+        ),
+      ),
+      findSuggestions: LanguageService.getLanguages,
+      additionCallback: (value) {
+        return Language(
+          name: value,
+          position: 0,
+        );
+      },
+      onAdded: (language) {
+        // api calls here, triggered when add to tag button is pressed
+        return Language();
+      },
+      configureSuggestion: (lang) {
+        return Tagging.SuggestionConfiguration(
+          title: Text(lang.name),
+          subtitle: Text(lang.position.toString()),
+          additionWidget: Chip(
+            avatar: Icon(
+              Icons.add_circle,
+              color: Colors.white,
+            ),
+            label: Text('Add New Tag'),
+            labelStyle: TextStyle(
+              color: Colors.white,
+              fontSize: 14.0,
+              fontWeight: FontWeight.w300,
+            ),
+            backgroundColor: Colors.teal,
+          ),
+        );
+      },
+      configureChip: (lang) {
+        return Tagging.ChipConfiguration(
+          label: Text(lang.name),
+          backgroundColor: Colors.teal,
+          labelStyle: TextStyle(color: Colors.white),
+          deleteIconColor: Colors.white,
+        );
+      },
+      onChanged: () {
+        setState(() {
+          _selectedValuesJson = _selectedLanguages
+              .map<String>((lang) => '\n${lang.toJson()}')
+              .toList()
+              .toString();
+          _selectedValuesJson = _selectedValuesJson.replaceFirst('}]', '}\n]');
+        });
+      },
     );
   }
 }
@@ -133,7 +207,7 @@ class LanguageService {
 }
 
 /// Language Class
-class Language extends Taggable {
+class Language extends Tagging.Taggable {
   ///
   final String name;
 
