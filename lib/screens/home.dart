@@ -1,3 +1,4 @@
+import 'package:clear_diary/database/database_instance.dart';
 import 'package:clear_diary/screens/diary_entry.dart';
 import 'package:clear_diary/screens/preferences.dart';
 import 'package:clear_diary/values/strings.dart';
@@ -32,6 +33,24 @@ class HomeBody extends StatelessWidget {
 }
 
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final dbAcess = DatabaseInstance.instance;
+
+  ///todo: test pending here
+  Future<void> insereEntry() async {
+    int secondsSinceEpoch =
+        (DateTime.now().millisecondsSinceEpoch / 1000) as int;
+    Map<String, dynamic> row = {
+      //DatabaseInstance.entryId: 1,
+      DatabaseInstance.entryDateCreated: secondsSinceEpoch,
+      DatabaseInstance.entryDateModified: secondsSinceEpoch,
+      DatabaseInstance.entryDateAssigned: secondsSinceEpoch,
+      DatabaseInstance.entryTitle: 'title here',
+      DatabaseInstance.entryBody: 'body here',
+    };
+    final id = await dbAcess.insert(row);
+    print('linha inserida id: $id');
+  }
+
   @override
   Widget build(BuildContext context) {
     return AppBar(

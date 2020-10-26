@@ -1,6 +1,6 @@
-import 'package:flutter_tagging/flutter_tagging.dart';
-
 class EntryModel {
+  int entryId;
+
   DateTime dateCreated;
   DateTime dateModified;
   DateTime dateAssigned;
