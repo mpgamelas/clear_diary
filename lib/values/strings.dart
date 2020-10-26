@@ -7,4 +7,7 @@ class Strings {
   static const String entryTitle = 'Entry Title';
   static const String entryText = 'Entry Text';
   static const String entryDate = 'Date of Entry';
+  static const String searchTags = 'Search Tags';
+  static const String selectTags = 'Select Tags';
+  static const String addNewTag = 'Add New Tag';
 }

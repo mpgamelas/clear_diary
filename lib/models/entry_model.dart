@@ -1,4 +1,5 @@
 import 'package:clear_diary/database/database_instance.dart';
+import 'package:clear_diary/models/tag_model.dart';
 
 class EntryModel {
   int entryId = -1;
@@ -9,7 +10,7 @@ class EntryModel {
 
   String title;
   String body;
-  List<String> tags;
+  List<TagModel> tags;
 
   EntryModel(
       {this.entryId,

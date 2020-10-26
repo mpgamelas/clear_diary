@@ -1,5 +1,6 @@
 import 'package:clear_diary/database/database_instance.dart';
 import 'package:clear_diary/models/entry_model.dart';
+import 'package:clear_diary/models/tag_model.dart';
 import 'package:sqflite/sqlite_api.dart';
 
 class EntryContract {
@@ -30,7 +31,7 @@ class EntryContract {
       //todo: try catch here
       int idEntryInserted = await db.insert(entry_table, map);
 
-      List<String> tagList = entry.tags;
+      List<TagModel> tagList = entry.tags;
       if (tagList != null && tagList.isNotEmpty) {
         //todo: insert tags here
       }

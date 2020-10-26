@@ -33,23 +33,6 @@ class HomeBody extends StatelessWidget {
 }
 
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final dbAccess = DatabaseInstance.instance;
-
-  // Future<void> insereEntry() async {
-  //   double secondsSinceEpoch = (DateTime.now().millisecondsSinceEpoch / 1000);
-  //   int temp = secondsSinceEpoch.toInt();
-  //   Map<String, dynamic> row = {
-  //     //DatabaseInstance.entryId: 1,
-  //     DatabaseInstance.entryDateCreated: temp,
-  //     DatabaseInstance.entryDateModified: temp,
-  //     DatabaseInstance.entryDateAssigned: temp,
-  //     DatabaseInstance.entryTitle: 'title here',
-  //     DatabaseInstance.entryBody: 'body here',
-  //   };
-  //   final id = await dbAcess.insert(row);
-  //   print('linha inserida id: $id');
-  // }
-
   @override
   Widget build(BuildContext context) {
     return AppBar(
