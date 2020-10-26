@@ -53,13 +53,13 @@ class DatabaseInstance {
             $entryDateModified INTEGER NOT NULL,
             $entryDateAssigned INTEGER,
             $entryTitle TEXT,
-            $entryBody TEXT,
+            $entryBody TEXT
           );
           CREATE TABLE IF NOT EXISTS $tags_table (
             $tagId INTEGER NOT NULL PRIMARY KEY,
             $tagDateCreated INTEGER NOT NULL,
             $tagDateModified INTEGER NOT NULL,
-            $tag TEXT NOT NULL,
+            $tag TEXT NOT NULL
           );
           CREATE TABLE IF NOT EXISTS $entry_tag_table (
             $entryId INTEGER NOT NULL,
@@ -70,6 +70,7 @@ class DatabaseInstance {
             FOREIGN KEY($tagId) REFERENCES $tags_table($tagId)
               ON UPDATE CASCADE
               ON DELETE CASCADE,
+            UNIQUE($entryId, $tagId)
           );
           ''';
     await db.execute(dbCreateCommand);

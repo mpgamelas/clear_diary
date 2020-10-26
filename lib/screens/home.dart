@@ -37,8 +37,8 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   ///todo: test pending here
   Future<void> insereEntry() async {
-    int secondsSinceEpoch =
-        (DateTime.now().millisecondsSinceEpoch / 1000) as int;
+    double secondsSinceEpoch = (DateTime.now().millisecondsSinceEpoch / 1000);
+    int temp = secondsSinceEpoch.toInt();
     Map<String, dynamic> row = {
       //DatabaseInstance.entryId: 1,
       DatabaseInstance.entryDateCreated: secondsSinceEpoch,
@@ -59,10 +59,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
         IconButton(
           icon: const Icon(Icons.add_alert),
           tooltip: 'Show Snackbar',
-          onPressed: () {
-            final snackBar = SnackBar(content: Text('Scaffold test'));
-            Scaffold.of(context).showSnackBar(snackBar);
-          },
+          onPressed: insereEntry,
         ),
         IconButton(
           icon: const Icon(Icons.search),
