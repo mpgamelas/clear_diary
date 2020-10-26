@@ -17,7 +17,8 @@ final Map<int, String> migrationScripts = {
             ${TagContract.tagId} INTEGER PRIMARY KEY,
             ${TagContract.tagDateCreated} INTEGER NOT NULL,
             ${TagContract.tagDateModified} INTEGER NOT NULL,
-            ${TagContract.tag} TEXT NOT NULL
+            ${TagContract.tag} TEXT NOT NULL,
+            UNIQUE(${TagContract.tag})
           );
           CREATE TABLE IF NOT EXISTS ${DatabaseInstance.entry_tag_table} (
             ${EntryContract.idColumn} INTEGER NOT NULL,

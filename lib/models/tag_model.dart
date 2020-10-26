@@ -1,12 +1,12 @@
 import 'package:flutter_tagging/flutter_tagging.dart' as Tagging;
 
 class TagModel extends Tagging.Taggable {
-  int tagId = -1;
+  int tagId;
 
   DateTime dateCreated;
   DateTime dateModified;
 
-  String tag;
+  final String tag;
 
   TagModel(
     this.tag, {

@@ -42,7 +42,8 @@ class _TextFieldTagsState extends State<TextFieldTags> {
       ),
       findSuggestions: TagService.getLanguages,
       additionCallback: (value) {
-        return TagModel(value);
+        DateTime now = DateTime.now();
+        return TagModel(value, dateCreated: now, dateModified: now);
       },
       onAdded: (value) {
         // api calls here, triggered when add to tag button is pressed
@@ -85,17 +86,20 @@ class _TextFieldTagsState extends State<TextFieldTags> {
   }
 }
 
+//todo: remove this asap
 class TagService {
   /// Mocks fetching tags with delay of 500ms.
   static Future<List<TagModel>> getLanguages(String query) async {
     await Future.delayed(Duration(milliseconds: 500), null);
+
+    DateTime now = DateTime.now();
     return <TagModel>[
-      TagModel('JavaScript'),
-      TagModel('Python'),
-      TagModel('Java'),
-      TagModel('PHP'),
-      TagModel('C#'),
-      TagModel('C++'),
+      TagModel('JavaScript', dateCreated: now, dateModified: now),
+      TagModel('Python', dateCreated: now, dateModified: now),
+      TagModel('Java', dateCreated: now, dateModified: now),
+      TagModel('PHP', dateCreated: now, dateModified: now),
+      TagModel('C#', dateCreated: now, dateModified: now),
+      TagModel('C++', dateCreated: now, dateModified: now),
     ]
         .where((lang) => lang.tag.toLowerCase().contains(query.toLowerCase()))
         .toList();
