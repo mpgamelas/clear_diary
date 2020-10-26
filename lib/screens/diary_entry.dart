@@ -36,18 +36,73 @@ class _DiaryEntryBodyState extends State<DiaryEntryBody> {
   final String entryTagsKey = 'entry_tags';
   final String entryBodyKey = 'entry_body';
 
+  EntryModel argumentPassed;
+  DateTime defaultDate = DateTime.now();
+  String defaultTitle = '';
+  List<String> defaultTags = [];
+  String defaultBody = '';
+
+  ///Used to set the fields to default values
+  @override
+  void initState() {
+    super.initState();
+
+    try {
+      argumentPassed = ModalRoute.of(context).settings.arguments;
+    } catch (e) {
+      print(e);
+      argumentPassed = null;
+    }
+
+    bool entryIsValid = argumentPassed == null || argumentPassed.entryId <= 0;
+    if (entryIsValid) {
+      defaultDate = argumentPassed.dateAssigned;
+      defaultTitle = argumentPassed.title;
+      defaultTags = argumentPassed.tags;
+      defaultBody = argumentPassed.body;
+    } else {
+      final now = DateTime.now();
+      final lastMidnight = new DateTime(now.year, now.month, now.day);
+      defaultDate = lastMidnight;
+    }
+  }
+
+  ///onClick method of Save button
+  void saveEntry() {
+    if (_fbKey.currentState.saveAndValidate()) {
+      DateTime entryDate = _fbKey.currentState.value[entryDateKey] as DateTime;
+      String entryTitle = _fbKey.currentState.value[entryTitleKey] as String;
+      //List<String> tags = _fbKey.currentState.value[entryTagsKey];
+      String entryBody = _fbKey.currentState.value[entryBodyKey] as String;
+
+      bool isNewEntry = argumentPassed == null || argumentPassed.entryId <= 0;
+      if (isNewEntry) {
+        EntryModel currentEntry = EntryModel(
+          dateCreated: DateTime.now(),
+          dateModified: DateTime.now(),
+          dateAssigned: entryDate,
+          title: entryTitle,
+          body: entryBody,
+        );
+        EntryContract.save(currentEntry);
+      } else {
+        //todo:update logic here
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final now = DateTime.now();
-    final lastMidnight = new DateTime(now.year, now.month, now.day);
-
     return ListView(
       padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
       children: <Widget>[
         FormBuilder(
           key: _fbKey,
           initialValue: {
-            entryDateKey: lastMidnight,
+            entryDateKey: defaultDate,
+            entryTitleKey: defaultTitle,
+            entryTagsKey: defaultTags,
+            entryBodyKey: defaultBody,
           },
           autovalidateMode: AutovalidateMode.disabled,
           child: Column(
@@ -83,31 +138,11 @@ class _DiaryEntryBodyState extends State<DiaryEntryBody> {
         ),
         Row(
           children: <Widget>[
-            MaterialButton(
+            RaisedButton(
               child: Text("Save"),
-              onPressed: () {
-                if (_fbKey.currentState.saveAndValidate()) {
-                  DateTime entryDate =
-                      _fbKey.currentState.value[entryDateKey] as DateTime;
-                  String entryTitle =
-                      _fbKey.currentState.value[entryTitleKey] as String;
-                  //var tags = _fbKey.currentState.value[entryTagsKey];
-                  String entryBody =
-                      _fbKey.currentState.value[entryBodyKey] as String;
-
-                  EntryModel currentEntry = EntryModel(
-                    dateCreated: DateTime.now(),
-                    dateModified: DateTime.now(),
-                    dateAssigned: entryDate,
-                    title: entryTitle,
-                    body: entryBody,
-                  );
-
-                  EntryContract.insert(currentEntry);
-                }
-              },
+              onPressed: saveEntry,
             ),
-            MaterialButton(
+            RaisedButton(
               child: Text("Reset"),
               onPressed: () {
                 _fbKey.currentState.reset();
@@ -120,7 +155,7 @@ class _DiaryEntryBodyState extends State<DiaryEntryBody> {
   }
 }
 
-///TODO: Limpar esse text tags
+///TODO: clean this section
 class TextFieldTags extends StatefulWidget {
   @override
   _TextFieldTagsState createState() => _TextFieldTagsState();

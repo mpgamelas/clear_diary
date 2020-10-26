@@ -14,7 +14,7 @@ class Home extends StatelessWidget {
       body: HomeBody(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(context, DiaryEntry.id);
+          Navigator.pushNamed(context, DiaryEntry.id, arguments: null);
         },
         tooltip: Strings.addEntry,
         child: Icon(Icons.add),

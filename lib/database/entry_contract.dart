@@ -12,22 +12,31 @@ class EntryContract {
   static const titleColumn = 'title';
   static const bodyColumn = 'body';
 
-  static void insert(EntryModel entry) async {
+  ///Inserts or update an Entry
+  static void save(EntryModel entry) async {
     Database db = await DatabaseInstance.instance.database;
     var map = <String, dynamic>{};
 
-    if (entry.entryId != null && entry.entryId > 0) {
+    //todo: branch for insert or update
+    bool isInsert = entry.entryId == null || entry.entryId <= 0;
+    if (isInsert) {
+      map[dateCreatedColumn] = secondsSinceEpoch(entry.dateCreated);
+      map[dateModifedColumn] = secondsSinceEpoch(entry.dateModified);
+      map[dateAssignedColumn] = secondsSinceEpoch(entry.dateAssigned);
+
+      map[titleColumn] = entry.title;
+      map[bodyColumn] = entry.body;
+
+      int idEntryInserted = await db.insert(entry_table, map);
+
+      List<String> tagList = entry.tags;
+      if (tagList != null && tagList.isNotEmpty) {
+        //todo: insert tags here
+      }
+    } else {
       map[idColumn] = entry.entryId;
+      //todo:finish here
     }
-
-    map[dateCreatedColumn] = secondsSinceEpoch(entry.dateCreated);
-    map[dateModifedColumn] = secondsSinceEpoch(entry.dateModified);
-    map[dateAssignedColumn] = secondsSinceEpoch(entry.dateAssigned);
-
-    map[titleColumn] = entry.title;
-    map[bodyColumn] = entry.body;
-
-    int idEntryInserted = await db.insert(entry_table, map);
   }
 
   // Future<List<Map<String, dynamic>>> queryAllRows() async {
