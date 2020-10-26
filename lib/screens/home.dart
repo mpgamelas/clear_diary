@@ -27,29 +27,28 @@ class HomeBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Text('teste'),
+      child: Text('center test'),
     );
   }
 }
 
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final dbAcess = DatabaseInstance.instance;
+  final dbAccess = DatabaseInstance.instance;
 
-  ///todo: test pending here
-  Future<void> insereEntry() async {
-    double secondsSinceEpoch = (DateTime.now().millisecondsSinceEpoch / 1000);
-    int temp = secondsSinceEpoch.toInt();
-    Map<String, dynamic> row = {
-      //DatabaseInstance.entryId: 1,
-      DatabaseInstance.entryDateCreated: temp,
-      DatabaseInstance.entryDateModified: temp,
-      DatabaseInstance.entryDateAssigned: temp,
-      DatabaseInstance.entryTitle: 'title here',
-      DatabaseInstance.entryBody: 'body here',
-    };
-    final id = await dbAcess.insert(row);
-    print('linha inserida id: $id');
-  }
+  // Future<void> insereEntry() async {
+  //   double secondsSinceEpoch = (DateTime.now().millisecondsSinceEpoch / 1000);
+  //   int temp = secondsSinceEpoch.toInt();
+  //   Map<String, dynamic> row = {
+  //     //DatabaseInstance.entryId: 1,
+  //     DatabaseInstance.entryDateCreated: temp,
+  //     DatabaseInstance.entryDateModified: temp,
+  //     DatabaseInstance.entryDateAssigned: temp,
+  //     DatabaseInstance.entryTitle: 'title here',
+  //     DatabaseInstance.entryBody: 'body here',
+  //   };
+  //   final id = await dbAcess.insert(row);
+  //   print('linha inserida id: $id');
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -58,8 +57,8 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
       actions: <Widget>[
         IconButton(
           icon: const Icon(Icons.add_alert),
-          tooltip: 'Show Snackbar',
-          onPressed: insereEntry,
+          tooltip: '',
+          onPressed: null,
         ),
         IconButton(
           icon: const Icon(Icons.search),

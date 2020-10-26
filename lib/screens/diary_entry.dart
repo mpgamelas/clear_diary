@@ -1,3 +1,5 @@
+import 'package:clear_diary/database/entry_contract.dart';
+import 'package:clear_diary/models/entry_model.dart';
 import 'package:clear_diary/values/strings.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -36,13 +38,16 @@ class _DiaryEntryBodyState extends State<DiaryEntryBody> {
 
   @override
   Widget build(BuildContext context) {
+    final now = DateTime.now();
+    final lastMidnight = new DateTime(now.year, now.month, now.day);
+
     return ListView(
       padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
       children: <Widget>[
         FormBuilder(
           key: _fbKey,
           initialValue: {
-            entryDateKey: DateTime.now(),
+            entryDateKey: lastMidnight,
           },
           autovalidateMode: AutovalidateMode.disabled,
           child: Column(
@@ -58,16 +63,16 @@ class _DiaryEntryBodyState extends State<DiaryEntryBody> {
                 decoration: InputDecoration(labelText: Strings.entryTitle),
                 validators: [],
               ),
-              FormBuilderCustomField(
-                attribute: entryTagsKey,
-                validators: [],
-                formField: FormField(
-                  enabled: true,
-                  builder: (FormFieldState<dynamic> field) {
-                    return TextFieldTags();
-                  },
-                ),
-              ),
+              // FormBuilderCustomField(
+              //   attribute: entryTagsKey,
+              //   validators: [],
+              //   formField: FormField(
+              //     enabled: true,
+              //     builder: (FormFieldState<dynamic> field) {
+              //       return TextFieldTags();
+              //     },
+              //   ),
+              // ),
               FormBuilderTextField(
                 attribute: entryBodyKey,
                 decoration: InputDecoration(labelText: Strings.entryText),
@@ -79,12 +84,26 @@ class _DiaryEntryBodyState extends State<DiaryEntryBody> {
         Row(
           children: <Widget>[
             MaterialButton(
-              child: Text("Submit"),
+              child: Text("Save"),
               onPressed: () {
                 if (_fbKey.currentState.saveAndValidate()) {
-                  var teste = _fbKey.currentState.value[entryDateKey];
-                  print(teste.runtimeType.toString());
-                  print(teste);
+                  DateTime entryDate =
+                      _fbKey.currentState.value[entryDateKey] as DateTime;
+                  String entryTitle =
+                      _fbKey.currentState.value[entryTitleKey] as String;
+                  //var tags = _fbKey.currentState.value[entryTagsKey];
+                  String entryBody =
+                      _fbKey.currentState.value[entryBodyKey] as String;
+
+                  EntryModel currentEntry = EntryModel(
+                    dateCreated: DateTime.now(),
+                    dateModified: DateTime.now(),
+                    dateAssigned: entryDate,
+                    title: entryTitle,
+                    body: entryBody,
+                  );
+
+                  EntryContract.insert(currentEntry);
                 }
               },
             ),
