@@ -27,6 +27,7 @@ class EntryContract {
       map[titleColumn] = entry.title;
       map[bodyColumn] = entry.body;
 
+      //todo: try catch here
       int idEntryInserted = await db.insert(entry_table, map);
 
       List<String> tagList = entry.tags;

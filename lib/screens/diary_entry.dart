@@ -54,8 +54,8 @@ class _DiaryEntryBodyState extends State<DiaryEntryBody> {
       argumentPassed = null;
     }
 
-    bool entryIsValid = argumentPassed == null || argumentPassed.entryId <= 0;
-    if (entryIsValid) {
+    bool isUpdate = argumentPassed != null && argumentPassed.entryId > 0;
+    if (isUpdate) {
       defaultDate = argumentPassed.dateAssigned;
       defaultTitle = argumentPassed.title;
       defaultTags = argumentPassed.tags;
@@ -75,8 +75,11 @@ class _DiaryEntryBodyState extends State<DiaryEntryBody> {
       //List<String> tags = _fbKey.currentState.value[entryTagsKey];
       String entryBody = _fbKey.currentState.value[entryBodyKey] as String;
 
-      bool isNewEntry = argumentPassed == null || argumentPassed.entryId <= 0;
-      if (isNewEntry) {
+      bool isUpdate = argumentPassed != null && argumentPassed.entryId > 0;
+      if (isUpdate) {
+        //todo:update logic here
+
+      } else {
         EntryModel currentEntry = EntryModel(
           dateCreated: DateTime.now(),
           dateModified: DateTime.now(),
@@ -85,9 +88,9 @@ class _DiaryEntryBodyState extends State<DiaryEntryBody> {
           body: entryBody,
         );
         EntryContract.save(currentEntry);
-      } else {
-        //todo:update logic here
       }
+
+      Navigator.pop(context);
     }
   }
 
@@ -130,6 +133,7 @@ class _DiaryEntryBodyState extends State<DiaryEntryBody> {
               // ),
               FormBuilderTextField(
                 attribute: entryBodyKey,
+                maxLines: null, //important so that text wraps
                 decoration: InputDecoration(labelText: Strings.entryText),
                 validators: [],
               ),
@@ -142,6 +146,7 @@ class _DiaryEntryBodyState extends State<DiaryEntryBody> {
               child: Text("Save"),
               onPressed: saveEntry,
             ),
+            SizedBox(width: 10.0),
             RaisedButton(
               child: Text("Reset"),
               onPressed: () {
