@@ -48,7 +48,7 @@ class DatabaseInstance {
   Future _onCreate(Database db, int version) async {
     String dbCreateCommand = '''
           CREATE TABLE IF NOT EXISTS $entry_table (
-            $entryId INTEGER NOT NULL PRIMARY KEY,
+            $entryId INTEGER PRIMARY KEY,
             $entryDateCreated INTEGER NOT NULL,
             $entryDateModified INTEGER NOT NULL,
             $entryDateAssigned INTEGER,
@@ -56,7 +56,7 @@ class DatabaseInstance {
             $entryBody TEXT
           );
           CREATE TABLE IF NOT EXISTS $tags_table (
-            $tagId INTEGER NOT NULL PRIMARY KEY,
+            $tagId INTEGER PRIMARY KEY,
             $tagDateCreated INTEGER NOT NULL,
             $tagDateModified INTEGER NOT NULL,
             $tag TEXT NOT NULL

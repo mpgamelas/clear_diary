@@ -41,9 +41,9 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
     int temp = secondsSinceEpoch.toInt();
     Map<String, dynamic> row = {
       //DatabaseInstance.entryId: 1,
-      DatabaseInstance.entryDateCreated: secondsSinceEpoch,
-      DatabaseInstance.entryDateModified: secondsSinceEpoch,
-      DatabaseInstance.entryDateAssigned: secondsSinceEpoch,
+      DatabaseInstance.entryDateCreated: temp,
+      DatabaseInstance.entryDateModified: temp,
+      DatabaseInstance.entryDateAssigned: temp,
       DatabaseInstance.entryTitle: 'title here',
       DatabaseInstance.entryBody: 'body here',
     };
