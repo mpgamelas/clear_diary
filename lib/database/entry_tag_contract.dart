@@ -8,6 +8,7 @@ class EntryTagContract {
   static const entry_tag_table = 'entries_tags';
 
   ///Inserts or update the tags of an entry
+  ///todo: everything here
   static Future<int> save(EntryModel entry) async {
     Database db = await DatabaseInstance.instance.database;
 

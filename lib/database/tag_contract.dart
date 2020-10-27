@@ -10,8 +10,7 @@ class TagContract {
   static const tagDateModified = 'date_modified';
   static const tag = 'tag';
 
-  ///Inserts or update a Tag.
-  /////TODO: TEST FOR REPEATED TAGS
+  ///Inserts or update a Tag, returns the rowID of the tag saved.
   static Future<int> save(TagModel tagModel) async {
     Database db = await DatabaseInstance.instance.database;
     var map = <String, dynamic>{};
@@ -26,6 +25,19 @@ class TagContract {
 
       int idEntryInserted = await db.insert(tags_table, map,
           conflictAlgorithm: ConflictAlgorithm.ignore);
+
+      if (idEntryInserted == null) {
+        List<Map<String, dynamic>> map = await db.query(tags_table,
+            columns: [tagId, tag],
+            where: '$tag LIKE ?',
+            whereArgs: [tagModel.tag]);
+
+        if (map.length > 1) {
+          throw Exception('Duplicate tag in table: $tags_table');
+        }
+
+        idEntryInserted = map[0][tagId] as int;
+      }
       return idEntryInserted;
     } else {
       //todo: update not implemented yet
@@ -40,6 +52,7 @@ class TagContract {
 
     Database db = await DatabaseInstance.instance.database;
 
+    //todo: pending test
     var list = await db.query(tags_table,
         columns: [tag], where: '$tag LIKE ?', whereArgs: [query]);
 

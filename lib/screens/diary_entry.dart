@@ -5,7 +5,6 @@ import 'package:clear_diary/values/strings.dart';
 import 'package:clear_diary/widgets/text_field_tags.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_tagging/flutter_tagging.dart' as Tagging;
 import 'package:intl/intl.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 

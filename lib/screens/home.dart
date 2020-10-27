@@ -1,4 +1,3 @@
-import 'package:clear_diary/database/database_instance.dart';
 import 'package:clear_diary/screens/diary_entry.dart';
 import 'package:clear_diary/screens/preferences.dart';
 import 'package:clear_diary/values/strings.dart';
