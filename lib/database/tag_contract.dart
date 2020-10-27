@@ -11,22 +11,43 @@ class TagContract {
   static const tag = 'tag';
 
   ///Inserts or update a Tag.
-  static void save(TagModel tagModel) async {
+  /////TODO: TEST FOR REPEATED TAGS
+  static Future<int> save(TagModel tagModel) async {
     Database db = await DatabaseInstance.instance.database;
     var map = <String, dynamic>{};
 
     bool isInsert = tagModel.tagId == null || tagModel.tagId <= 0;
     if (isInsert) {
-      map[tagDateCreated] = secondsSinceEpoch(tagModel.dateCreated);
-      map[tagDateModified] = secondsSinceEpoch(tagModel.dateModified);
+      int secondsUnix = secondsSinceEpoch(DateTime.now());
+      map[tagDateCreated] = secondsUnix;
+      map[tagDateModified] = secondsUnix;
 
       map[tag] = tagModel.tag;
 
       int idEntryInserted = await db.insert(tags_table, map,
           conflictAlgorithm: ConflictAlgorithm.ignore);
+      return idEntryInserted;
     } else {
-      //todo:finish here
+      //todo: update not implemented yet
+      return -1;
     }
+  }
+
+  static Future<List<TagModel>> query(String query) async {
+    if (query.length < 3) {
+      return []; //don't even bother searching for 2 characters or less
+    }
+
+    Database db = await DatabaseInstance.instance.database;
+
+    var list = await db.query(tags_table,
+        columns: [tag], where: '$tag LIKE ?', whereArgs: [query]);
+
+    var list2 = await db.rawQuery('''
+    SELECT * FROM $tags_table WHERE $tag LIKE ?
+    ''', [query]);
+
+    return [];
   }
 
   static int secondsSinceEpoch(DateTime date) {

@@ -1,4 +1,5 @@
 import 'package:clear_diary/database/database_instance.dart';
+import 'package:clear_diary/database/tag_contract.dart';
 import 'package:clear_diary/models/entry_model.dart';
 import 'package:clear_diary/models/tag_model.dart';
 import 'package:sqflite/sqlite_api.dart';
@@ -33,11 +34,14 @@ class EntryContract {
 
       List<TagModel> tagList = entry.tags;
       if (tagList != null && tagList.isNotEmpty) {
-        //todo: insert tags here
+        //todo: insert tags here and record on entryXtags table
+        for (TagModel tag in tagList) {
+          int tagIdInserted = await TagContract.save(tag);
+        }
       }
     } else {
       map[idColumn] = entry.entryId;
-      //todo:finish here
+      //todo:finish update here
     }
   }
 

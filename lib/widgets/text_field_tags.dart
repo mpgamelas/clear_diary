@@ -1,3 +1,4 @@
+import 'package:clear_diary/database/tag_contract.dart';
 import 'package:clear_diary/models/tag_model.dart';
 import 'package:clear_diary/values/strings.dart';
 import 'package:flutter/material.dart';
@@ -40,15 +41,14 @@ class _TextFieldTagsState extends State<TextFieldTags> {
           labelText: Strings.selectTags,
         ),
       ),
-      findSuggestions: TagService.getLanguages,
+      findSuggestions: TagContract.query,
       additionCallback: (value) {
         DateTime now = DateTime.now();
         return TagModel(value, dateCreated: now, dateModified: now);
       },
-      onAdded: (value) {
+      onAdded: (tagModel) {
         // api calls here, triggered when add to tag button is pressed
-        //todo: Add Tag to DB
-        return value;
+        return tagModel;
       },
       configureSuggestion: (tagModel) {
         return Tagging.SuggestionConfiguration(
@@ -78,30 +78,9 @@ class _TextFieldTagsState extends State<TextFieldTags> {
       },
       onChanged: () {
         setState(() {
-          print('Some test here');
           widget.formField.didChange(_tagList);
         });
       },
     );
-  }
-}
-
-//todo: remove this asap
-class TagService {
-  /// Mocks fetching tags with delay of 500ms.
-  static Future<List<TagModel>> getLanguages(String query) async {
-    await Future.delayed(Duration(milliseconds: 500), null);
-
-    DateTime now = DateTime.now();
-    return <TagModel>[
-      TagModel('JavaScript', dateCreated: now, dateModified: now),
-      TagModel('Python', dateCreated: now, dateModified: now),
-      TagModel('Java', dateCreated: now, dateModified: now),
-      TagModel('PHP', dateCreated: now, dateModified: now),
-      TagModel('C#', dateCreated: now, dateModified: now),
-      TagModel('C++', dateCreated: now, dateModified: now),
-    ]
-        .where((lang) => lang.tag.toLowerCase().contains(query.toLowerCase()))
-        .toList();
   }
 }
