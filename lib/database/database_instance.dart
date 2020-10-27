@@ -51,6 +51,10 @@ class DatabaseInstance {
           await db.execute(script);
         }
       }
+    }, onConfigure: (db) async {
+      for (String script in configureScripts) {
+        await db.execute(script);
+      }
     });
     return db;
   }

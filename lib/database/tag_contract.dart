@@ -5,10 +5,10 @@ import 'database_instance.dart';
 
 class TagContract {
   static const tags_table = 'tags';
-  static const tagId = 'tag_id';
-  static const tagDateCreated = 'date_created';
-  static const tagDateModified = 'date_modified';
-  static const tag = 'tag';
+  static const tagIdColumn = 'tag_id';
+  static const tagDateCreatedColumn = 'date_created';
+  static const tagDateModifiedColumn = 'date_modified';
+  static const tagColumn = 'tag';
 
   ///Inserts or update a Tag, returns the rowID of the tag saved.
   static Future<int> save(TagModel tagModel) async {
@@ -18,25 +18,25 @@ class TagContract {
     bool isInsert = tagModel.tagId == null || tagModel.tagId <= 0;
     if (isInsert) {
       int secondsUnix = secondsSinceEpoch(DateTime.now());
-      map[tagDateCreated] = secondsUnix;
-      map[tagDateModified] = secondsUnix;
+      map[tagDateCreatedColumn] = secondsUnix;
+      map[tagDateModifiedColumn] = secondsUnix;
 
-      map[tag] = tagModel.tag;
+      map[tagColumn] = tagModel.tag;
 
       int idEntryInserted = await db.insert(tags_table, map,
           conflictAlgorithm: ConflictAlgorithm.ignore);
 
       if (idEntryInserted == null) {
         List<Map<String, dynamic>> map = await db.query(tags_table,
-            columns: [tagId, tag],
-            where: '$tag LIKE ?',
+            columns: [tagIdColumn, tagColumn],
+            where: '$tagColumn LIKE ?',
             whereArgs: [tagModel.tag]);
 
         if (map.length > 1) {
           throw Exception('Duplicate tag in table: $tags_table');
         }
 
-        idEntryInserted = map[0][tagId] as int;
+        idEntryInserted = map[0][tagIdColumn] as int;
       }
       return idEntryInserted;
     } else {
@@ -52,15 +52,32 @@ class TagContract {
 
     Database db = await DatabaseInstance.instance.database;
 
-    //todo: pending test
     var list = await db.query(tags_table,
-        columns: [tag], where: '$tag LIKE ?', whereArgs: [query]);
+        columns: [
+          tagIdColumn,
+          tagColumn,
+          tagDateCreatedColumn,
+          tagDateModifiedColumn
+        ],
+        where: '$tagColumn LIKE ?',
+        whereArgs: ['%$query%']);
 
-    var list2 = await db.rawQuery('''
-    SELECT * FROM $tags_table WHERE $tag LIKE ?
-    ''', [query]);
+    //todo: fix the date conversion from int to DAteTime
+    List<TagModel> tagList = [];
+    list.forEach((map) {
+      TagModel tag = TagModel(map[tagColumn]);
+      tag.tagId = map[tagIdColumn];
+      // tag.dateCreated = map[tagDateCreatedColumn];
+      // tag.dateModified = map[tagDateModifiedColumn];
 
-    return [];
+      tagList.add(tag);
+    });
+
+    // var list2 = await db.rawQuery('''
+    // SELECT * FROM $tags_table WHERE $tag LIKE ?
+    // ''', [query]);
+
+    return tagList;
   }
 
   static int secondsSinceEpoch(DateTime date) {
