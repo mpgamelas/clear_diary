@@ -1,4 +1,5 @@
 import 'package:clear_diary/database/database_instance.dart';
+import 'package:clear_diary/database/entry_tag_contract.dart';
 import 'package:clear_diary/database/tag_contract.dart';
 import 'package:clear_diary/models/entry_model.dart';
 import 'package:clear_diary/models/tag_model.dart';
@@ -19,7 +20,6 @@ class EntryContract {
     Database db = await DatabaseInstance.instance.database;
     var map = <String, dynamic>{};
 
-    //todo: branch for insert or update
     bool isInsert = entry.entryId == null || entry.entryId <= 0;
     if (isInsert) {
       map[dateCreatedColumn] = secondsSinceEpoch(entry.dateCreated);
@@ -29,15 +29,33 @@ class EntryContract {
       map[titleColumn] = entry.title;
       map[bodyColumn] = entry.body;
 
-      //todo: try catch here
       int idEntryInserted = await db.insert(entry_table, map);
 
+      if (idEntryInserted == null || idEntryInserted <= 0) {
+        throw Exception('Invalid ID of new Entry!: $idEntryInserted');
+      }
+
       List<TagModel> tagList = entry.tags;
+      List<int> tagIdsInserted = [];
       if (tagList != null && tagList.isNotEmpty) {
-        //todo: insert tags here and record on entryXtags table
         for (TagModel tag in tagList) {
           int tagIdInserted = await TagContract.save(tag);
+
+          if (tagIdInserted == null || tagIdInserted <= 0) {
+            throw Exception('Invalid TagID!');
+          }
+          tagIdsInserted.add(tagIdInserted);
         }
+      }
+
+      //sanity check
+      if (tagList.length != tagIdsInserted.length) {
+        String debugInfo = 'missing tagIDs on entry insert!';
+        throw Exception(debugInfo);
+      }
+
+      for (int tagId in tagIdsInserted) {
+        await EntryTagContract.save(idEntryInserted, tagId);
       }
     } else {
       map[idColumn] = entry.entryId;

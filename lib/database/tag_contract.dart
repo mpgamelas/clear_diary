@@ -23,10 +23,10 @@ class TagContract {
 
       map[tagColumn] = tagModel.tag;
 
-      int idEntryInserted = await db.insert(tags_table, map,
+      int idTagInserted = await db.insert(tags_table, map,
           conflictAlgorithm: ConflictAlgorithm.ignore);
 
-      if (idEntryInserted == null) {
+      if (idTagInserted == null) {
         List<Map<String, dynamic>> map = await db.query(tags_table,
             columns: [tagIdColumn, tagColumn],
             where: '$tagColumn LIKE ?',
@@ -36,20 +36,25 @@ class TagContract {
           throw Exception('Duplicate tag in table: $tags_table');
         }
 
-        idEntryInserted = map[0][tagIdColumn] as int;
+        idTagInserted = map[0][tagIdColumn] as int;
       }
-      return idEntryInserted;
+
+      if (idTagInserted == null || idTagInserted <= 0) {
+        throw Exception('Invalid TagID!');
+      }
+
+      return idTagInserted;
     } else {
       //todo: update not implemented yet
-      return -1;
+      if (tagModel.tagId != null && tagModel.tagId > 0) {
+        return tagModel.tagId;
+      } else {
+        return -1;
+      }
     }
   }
 
   static Future<List<TagModel>> query(String query) async {
-    if (query.length < 3) {
-      return []; //don't even bother searching for 2 characters or less
-    }
-
     Database db = await DatabaseInstance.instance.database;
 
     var list = await db.query(tags_table,
