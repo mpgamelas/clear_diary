@@ -63,6 +63,29 @@ class EntryContract {
     }
   }
 
+  static Future<List<EntryModel>> queryByDate(
+      DateTime start, DateTime end) async {
+    Database db = await DatabaseInstance.instance.database;
+
+    //todo: add the query here
+    List<EntryModel> listEntries = [];
+    for (int i = 1; i <= 10; i++) {
+      EntryModel entry = EntryModel();
+      entry.entryId = i;
+      entry.dateCreated = DateTime.now();
+      entry.dateModified = DateTime.now();
+      entry.dateAssigned = DateTime.now();
+      entry.title = 'DEBUG TITLE $i';
+      entry.body = 'DEBUG BODY $i';
+      entry.tags = [TagModel('tag$i'), TagModel('test'), TagModel('testet')];
+      listEntries.add(entry);
+    }
+
+    await Future.delayed(Duration(seconds: 5));
+
+    return listEntries;
+  }
+
   // Future<List<Map<String, dynamic>>> queryAllRows() async {
   //   Database db = await instance.database;
   //   return await db.query(entry_table);

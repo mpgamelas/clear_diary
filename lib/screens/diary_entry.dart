@@ -79,7 +79,7 @@ class _DiaryEntryBodyState extends State<DiaryEntryBody> {
 
       bool isUpdate = argumentPassed != null && argumentPassed.entryId > 0;
       if (isUpdate) {
-        //todo:update logic here
+        //todo:update logic here, if it is necessary
 
       } else {
         EntryModel currentEntry = EntryModel(

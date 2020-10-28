@@ -20,4 +20,8 @@ class EntryModel {
       this.title,
       this.body,
       this.tags});
+
+  EntryModel.fromMap(Map<String, dynamic> map) {
+    //todo: here
+  }
 }

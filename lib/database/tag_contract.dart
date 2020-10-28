@@ -78,10 +78,6 @@ class TagContract {
       tagList.add(tag);
     });
 
-    // var list2 = await db.rawQuery('''
-    // SELECT * FROM $tags_table WHERE $tag LIKE ?
-    // ''', [query]);
-
     return tagList;
   }
 

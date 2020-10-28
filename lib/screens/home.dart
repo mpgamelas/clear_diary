@@ -1,3 +1,5 @@
+import 'package:clear_diary/database/entry_contract.dart';
+import 'package:clear_diary/models/entry_model.dart';
 import 'package:clear_diary/screens/diary_entry.dart';
 import 'package:clear_diary/screens/preferences.dart';
 import 'package:clear_diary/values/strings.dart';
@@ -22,15 +24,31 @@ class Home extends StatelessWidget {
   }
 }
 
+///Main body of initial screen
 class HomeBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text('center test'),
-    );
+    return FutureBuilder<List<EntryModel>>(
+        future: EntryContract.queryByDate(null, null),
+        builder:
+            (BuildContext context, AsyncSnapshot<List<EntryModel>> snapshot) {
+          if (snapshot.hasData) {
+            List<EntryModel> entries = snapshot.data;
+            //todo: build the listview here
+            return Center(
+              child: Text('data here'),
+            );
+          } else {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        });
   }
 }
 
+///AppBar of the Initialscreen.
+///todo: remove the test icons
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
@@ -58,6 +76,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
+  //Necessary for PreferredSizeWidget, maybe remove it later by embedding the appBar
   @override
   Size get preferredSize => new Size.fromHeight(kToolbarHeight);
 }
