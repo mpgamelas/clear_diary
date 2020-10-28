@@ -22,9 +22,12 @@ class EntryContract {
 
     bool isInsert = entry.entryId == null || entry.entryId <= 0;
     if (isInsert) {
-      map[dateCreatedColumn] = secondsSinceEpoch(entry.dateCreated);
-      map[dateModifedColumn] = secondsSinceEpoch(entry.dateModified);
-      map[dateAssignedColumn] = secondsSinceEpoch(entry.dateAssigned);
+      map[dateCreatedColumn] =
+          DatabaseInstance.secondsSinceEpoch(entry.dateCreated);
+      map[dateModifedColumn] =
+          DatabaseInstance.secondsSinceEpoch(entry.dateModified);
+      map[dateAssignedColumn] =
+          DatabaseInstance.secondsSinceEpoch(entry.dateAssigned);
 
       map[titleColumn] = entry.title;
       map[bodyColumn] = entry.body;
@@ -108,8 +111,4 @@ class EntryContract {
   //   Database db = await instance.database;
   //   return await db.delete(entry_table, where: '$idColumn = ?', whereArgs: [id]);
   // }
-
-  static int secondsSinceEpoch(DateTime date) {
-    return date.millisecondsSinceEpoch ~/ 1000;
-  }
 }

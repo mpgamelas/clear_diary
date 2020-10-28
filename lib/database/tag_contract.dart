@@ -17,7 +17,7 @@ class TagContract {
 
     bool isInsert = tagModel.tagId == null || tagModel.tagId <= 0;
     if (isInsert) {
-      int secondsUnix = secondsSinceEpoch(DateTime.now());
+      int secondsUnix = DatabaseInstance.secondsSinceEpoch(DateTime.now());
       map[tagDateCreatedColumn] = secondsUnix;
       map[tagDateModifiedColumn] = secondsUnix;
 
@@ -79,9 +79,5 @@ class TagContract {
     });
 
     return tagList;
-  }
-
-  static int secondsSinceEpoch(DateTime date) {
-    return date.millisecondsSinceEpoch ~/ 1000;
   }
 }
