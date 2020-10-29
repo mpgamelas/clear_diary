@@ -48,6 +48,7 @@ class _DiaryEntryBodyState extends State<DiaryEntryBody> {
   void initState() {
     super.initState();
 
+    //todo: check the warning that happens here
     try {
       argumentPassed = ModalRoute.of(context).settings.arguments;
     } catch (e) {

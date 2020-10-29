@@ -69,7 +69,7 @@ class EntryContract {
 
     //todo: add the query here
     List<EntryModel> listEntries = [];
-    for (int i = 1; i <= 10; i++) {
+    for (int i = 1; i <= 30; i++) {
       EntryModel entry = EntryModel();
       entry.entryId = i;
       entry.dateCreated = DateTime.now();

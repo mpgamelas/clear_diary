@@ -1,4 +1,5 @@
-/// Class holding all user visible strings, later will be used on localization.
+/// Class holding all user visible strings.
+/// todo: use the proper flutter localization.
 class Strings {
   static const String homeScreenTitle = 'Home Screen';
   static const String addEntry = 'Add entry';
@@ -10,4 +11,5 @@ class Strings {
   static const String searchTags = 'Search Tags';
   static const String selectTags = 'Select Tags';
   static const String addNewTag = 'Add New Tag';
+  static const String anErrorOcurred = 'An error has ocurred!';
 }
