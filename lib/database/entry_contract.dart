@@ -22,12 +22,9 @@ class EntryContract {
 
     bool isInsert = entry.entryId == null || entry.entryId <= 0;
     if (isInsert) {
-      map[dateCreatedColumn] =
-          DatabaseInstance.secondsSinceEpoch(entry.dateCreated);
-      map[dateModifedColumn] =
-          DatabaseInstance.secondsSinceEpoch(entry.dateModified);
-      map[dateAssignedColumn] =
-          DatabaseInstance.secondsSinceEpoch(entry.dateAssigned);
+      map[dateCreatedColumn] = entry.dateCreated.millisecondsSinceEpoch;
+      map[dateModifedColumn] = entry.dateModified.millisecondsSinceEpoch;
+      map[dateAssignedColumn] = entry.dateAssigned.millisecondsSinceEpoch;
 
       map[titleColumn] = entry.title;
       map[bodyColumn] = entry.body;

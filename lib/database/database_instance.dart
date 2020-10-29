@@ -58,18 +58,4 @@ class DatabaseInstance {
     });
     return db;
   }
-
-  ///Convert the [DateTime] to seconds since the unix epoch, format used by SQLite.
-  static int secondsSinceEpoch(DateTime date) {
-    return date.millisecondsSinceEpoch ~/ 1000;
-  }
-
-  ///Convert seconds since the unix epoch to the local [DateTime].
-  ///todo: test this and write test for it
-  static DateTime dateFromEpoch(int secondsSinceEpoch) {
-    int miliseg = secondsSinceEpoch * 1000;
-    DateTime test = DateTime.fromMillisecondsSinceEpoch(miliseg, isUtc: true);
-    int kokokppoplp = 6;
-    return test;
-  }
 }

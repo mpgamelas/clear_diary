@@ -17,9 +17,9 @@ class TagContract {
 
     bool isInsert = tagModel.tagId == null || tagModel.tagId <= 0;
     if (isInsert) {
-      int secondsUnix = DatabaseInstance.secondsSinceEpoch(DateTime.now());
-      map[tagDateCreatedColumn] = secondsUnix;
-      map[tagDateModifiedColumn] = secondsUnix;
+      int milisegEpoch = DateTime.now().millisecondsSinceEpoch;
+      map[tagDateCreatedColumn] = milisegEpoch;
+      map[tagDateModifiedColumn] = milisegEpoch;
 
       map[tagColumn] = tagModel.tag;
 
