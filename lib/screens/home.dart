@@ -107,8 +107,7 @@ class EntryCard extends StatelessWidget {
       child: InkWell(
         splashColor: Values.cardColor,
         onTap: () {
-          //todo: open diary entry with chosen entry
-          print('Card tapped.');
+          Navigator.pushNamed(context, DiaryEntry.id, arguments: entry);
         },
         child: Container(
           child: ListTile(

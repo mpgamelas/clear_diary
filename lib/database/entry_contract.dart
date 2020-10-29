@@ -67,7 +67,55 @@ class EntryContract {
       DateTime start, DateTime end) async {
     Database db = await DatabaseInstance.instance.database;
 
-    //todo: add the query here
+    int startDate = start.millisecondsSinceEpoch;
+    int endDate = end.millisecondsSinceEpoch;
+
+    List<Map<String, dynamic>> list = await db.query(entry_table,
+        columns: [
+          idColumn,
+          dateCreatedColumn,
+          dateModifedColumn,
+          dateAssignedColumn,
+          titleColumn,
+          bodyColumn
+        ],
+        where: '$dateAssignedColumn BETWEEN ? AND ?',
+        orderBy: '$dateAssignedColumn ASC',
+        whereArgs: [startDate, endDate]);
+
+    EntryModel entry = EntryModel();
+
+    var readOnlyMap = list.first;
+
+    entry.entryId = readOnlyMap[EntryContract.idColumn];
+
+    entry.dateCreated = DateTime.fromMillisecondsSinceEpoch(
+        readOnlyMap[EntryContract.dateCreatedColumn]);
+    entry.dateModified = DateTime.fromMillisecondsSinceEpoch(
+        readOnlyMap[EntryContract.dateModifedColumn]);
+    entry.dateAssigned = DateTime.fromMillisecondsSinceEpoch(
+        readOnlyMap[EntryContract.dateAssignedColumn]);
+
+    entry.title = readOnlyMap[EntryContract.titleColumn];
+    entry.body = readOnlyMap[EntryContract.bodyColumn];
+
+    // List<TagModel> tagList = [];
+    // list.forEach((map) {
+    //   TagModel tag = TagModel(map[tagColumn]);
+    //   tag.tagId = map[tagIdColumn];
+    //   // tag.dateCreated = map[tagDateCreatedColumn];
+    //   // tag.dateModified = map[tagDateModifiedColumn];
+    //
+    //   tagList.add(tag);
+    // });
+
+    await Future.delayed(Duration(seconds: 5));
+
+    return getMockEntries();
+  }
+
+  ///For testing
+  static List<EntryModel> getMockEntries() {
     List<EntryModel> listEntries = [];
     for (int i = 1; i <= 30; i++) {
       EntryModel entry = EntryModel();
@@ -80,8 +128,6 @@ class EntryContract {
       entry.tags = [TagModel('tag$i'), TagModel('test'), TagModel('testet')];
       listEntries.add(entry);
     }
-
-    await Future.delayed(Duration(seconds: 5));
 
     return listEntries;
   }

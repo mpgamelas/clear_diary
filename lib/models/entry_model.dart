@@ -1,4 +1,5 @@
 import 'package:clear_diary/database/database_instance.dart';
+import 'package:clear_diary/database/entry_contract.dart';
 import 'package:clear_diary/models/tag_model.dart';
 
 class EntryModel {
@@ -22,6 +23,10 @@ class EntryModel {
       this.tags});
 
   EntryModel.fromMap(Map<String, dynamic> map) {
-    //todo: here
+    EntryModel entry = EntryModel();
+
+    entry.entryId = map[EntryContract.idColumn];
+
+    entry.dateCreated = map[EntryContract.dateCreatedColumn];
   }
 }

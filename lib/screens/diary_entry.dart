@@ -43,12 +43,18 @@ class _DiaryEntryBodyState extends State<DiaryEntryBody> {
   List<TagModel> defaultTags = [];
   String defaultBody = '';
 
-  ///Used to set the fields to default values
   @override
   void initState() {
     super.initState();
 
-    //todo: check the warning that happens here
+    //necessary to get arguments
+    // WidgetsBinding.instance.addPostFrameCallback((_) async {
+    //   getPassedEntry();
+    // });
+  }
+
+  ///Used to set the fields to default values
+  void getPassedEntry() {
     try {
       argumentPassed = ModalRoute.of(context).settings.arguments;
     } catch (e) {
@@ -100,6 +106,8 @@ class _DiaryEntryBodyState extends State<DiaryEntryBody> {
 
   @override
   Widget build(BuildContext context) {
+    getPassedEntry();
+
     return ListView(
       padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
       children: <Widget>[
