@@ -8,7 +8,10 @@ final Map<int, List<String>> migrationScripts = {
   1: [createTableEntry, createTableTag, createTableEntryTag]
 };
 
-final List<String> configureScripts = [pragmaCaseInsensitive];
+final List<String> configureScripts = [
+  pragmaCaseInsensitive,
+  pragmaForeignKeys
+];
 
 const String createTableEntry = '''
           CREATE TABLE IF NOT EXISTS ${EntryContract.entry_table} (
@@ -46,3 +49,6 @@ const String createTableEntryTag =
 
 ///So that the LIKE operator in SQL is case sensitive.
 const String pragmaCaseInsensitive = '''PRAGMA case_sensitive_like = TRUE''';
+
+///So that foreign keys are used.
+const String pragmaForeignKeys = '''PRAGMA foreign_keys = ON;''';
