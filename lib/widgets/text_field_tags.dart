@@ -41,7 +41,7 @@ class _TextFieldTagsState extends State<TextFieldTags> {
           labelText: Strings.selectTags,
         ),
       ),
-      findSuggestions: TagContract.query,
+      findSuggestions: TagContract.queryByName,
       additionCallback: (value) {
         DateTime now = DateTime.now();
         return TagModel(value, dateCreated: now, dateModified: now);

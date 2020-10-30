@@ -1,3 +1,4 @@
+import 'package:clear_diary/database/tag_contract.dart';
 import 'package:flutter_tagging/flutter_tagging.dart' as Tagging;
 
 class TagModel extends Tagging.Taggable {
@@ -6,7 +7,7 @@ class TagModel extends Tagging.Taggable {
   DateTime dateCreated;
   DateTime dateModified;
 
-  final String tag;
+  String tag;
 
   TagModel(
     this.tag, {
@@ -17,4 +18,15 @@ class TagModel extends Tagging.Taggable {
 
   @override
   List<Object> get props => [tag];
+
+  TagModel.fromMap(Map<String, dynamic> readOnlyMap) {
+    tagId = readOnlyMap[TagContract.tagIdColumn];
+
+    dateCreated = DateTime.fromMillisecondsSinceEpoch(
+        readOnlyMap[TagContract.tagDateCreatedColumn]);
+    dateModified = DateTime.fromMillisecondsSinceEpoch(
+        readOnlyMap[TagContract.tagDateModifiedColumn]);
+
+    tag = readOnlyMap[TagContract.tagColumn];
+  }
 }

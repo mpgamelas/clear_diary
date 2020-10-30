@@ -32,7 +32,7 @@ class HomeBody extends StatelessWidget {
   Widget build(BuildContext context) {
     //todo: check if the query future is being called many times
     return FutureBuilder<List<EntryModel>>(
-        future: EntryContract.queryByDate(null, null),
+        future: EntryContract.queryByDate(DateTime(2020), DateTime.now()),
         builder:
             (BuildContext context, AsyncSnapshot<List<EntryModel>> snapshot) {
           if (snapshot.hasData) {

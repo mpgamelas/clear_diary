@@ -63,6 +63,7 @@ class EntryContract {
     }
   }
 
+  ///Return a list of [EntryModel] in the range of [start] and [end].
   static Future<List<EntryModel>> queryByDate(
       DateTime start, DateTime end) async {
     Database db = await DatabaseInstance.instance.database;
@@ -70,7 +71,7 @@ class EntryContract {
     int startDate = start.millisecondsSinceEpoch;
     int endDate = end.millisecondsSinceEpoch;
 
-    List<Map<String, dynamic>> list = await db.query(entry_table,
+    List<Map<String, dynamic>> queryList = await db.query(entry_table,
         columns: [
           idColumn,
           dateCreatedColumn,
@@ -83,38 +84,20 @@ class EntryContract {
         orderBy: '$dateAssignedColumn ASC',
         whereArgs: [startDate, endDate]);
 
-    EntryModel entry = EntryModel();
+    List<EntryModel> listEntries = [];
+    for (Map<String, dynamic> map in queryList) {
+      EntryModel entry = EntryModel.fromMap(map);
+      listEntries.add(entry);
+    }
 
-    var readOnlyMap = list.first;
+    for (var entry in listEntries) {
+      entry.tags = await TagContract.queryByEntryId(entry.entryId);
+    }
 
-    entry.entryId = readOnlyMap[EntryContract.idColumn];
-
-    entry.dateCreated = DateTime.fromMillisecondsSinceEpoch(
-        readOnlyMap[EntryContract.dateCreatedColumn]);
-    entry.dateModified = DateTime.fromMillisecondsSinceEpoch(
-        readOnlyMap[EntryContract.dateModifedColumn]);
-    entry.dateAssigned = DateTime.fromMillisecondsSinceEpoch(
-        readOnlyMap[EntryContract.dateAssignedColumn]);
-
-    entry.title = readOnlyMap[EntryContract.titleColumn];
-    entry.body = readOnlyMap[EntryContract.bodyColumn];
-
-    // List<TagModel> tagList = [];
-    // list.forEach((map) {
-    //   TagModel tag = TagModel(map[tagColumn]);
-    //   tag.tagId = map[tagIdColumn];
-    //   // tag.dateCreated = map[tagDateCreatedColumn];
-    //   // tag.dateModified = map[tagDateModifiedColumn];
-    //
-    //   tagList.add(tag);
-    // });
-
-    await Future.delayed(Duration(seconds: 5));
-
-    return getMockEntries();
+    return listEntries;
   }
 
-  ///For testing
+  ///For testing purposes.
   static List<EntryModel> getMockEntries() {
     List<EntryModel> listEntries = [];
     for (int i = 1; i <= 30; i++) {
@@ -132,10 +115,6 @@ class EntryContract {
     return listEntries;
   }
 
-  // Future<List<Map<String, dynamic>>> queryAllRows() async {
-  //   Database db = await instance.database;
-  //   return await db.query(entry_table);
-  // }
   //
   // Future<int> queryRowCount() async {
   //   Database db = await instance.database;

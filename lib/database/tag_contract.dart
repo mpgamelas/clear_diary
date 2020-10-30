@@ -1,3 +1,4 @@
+import 'package:clear_diary/database/entry_tag_contract.dart';
 import 'package:clear_diary/models/tag_model.dart';
 import 'package:sqflite/sqlite_api.dart';
 
@@ -54,7 +55,8 @@ class TagContract {
     }
   }
 
-  static Future<List<TagModel>> query(String query) async {
+  ///Searches tags that match a certain [String].
+  static Future<List<TagModel>> queryByName(String query) async {
     Database db = await DatabaseInstance.instance.database;
 
     var list = await db.query(tags_table,
@@ -67,17 +69,43 @@ class TagContract {
         where: '$tagColumn LIKE ?',
         whereArgs: ['%$query%']);
 
-    //todo: fix the date conversion from int to DAteTime
     List<TagModel> tagList = [];
     list.forEach((map) {
       TagModel tag = TagModel(map[tagColumn]);
       tag.tagId = map[tagIdColumn];
-      // tag.dateCreated = map[tagDateCreatedColumn];
-      // tag.dateModified = map[tagDateModifiedColumn];
+      tag.dateCreated =
+          DateTime.fromMillisecondsSinceEpoch(map[tagDateCreatedColumn]);
+      tag.dateModified =
+          DateTime.fromMillisecondsSinceEpoch(map[tagDateModifiedColumn]);
 
       tagList.add(tag);
     });
 
     return tagList;
+  }
+
+  ///Searches the tags that belong to a single [EntryModel] ID.
+  static Future<List<TagModel>> queryByEntryId(int entryId) async {
+    Database db = await DatabaseInstance.instance.database;
+
+    String querySql = '''
+    SELECT * FROM $tags_table WHERE $tagIdColumn IN (
+                                                  SELECT
+                                                    ${EntryTagContract.tagIdColumn}
+                                                  FROM
+                                                    ${EntryTagContract.entry_tag_table}
+                                                  WHERE
+                                                    ${EntryTagContract.entryIdColumn} = ?
+                                                )
+    ''';
+    var tagsQuery = await db.rawQuery(querySql, [entryId]);
+
+    List<TagModel> tagsList = [];
+    tagsQuery.forEach((tagQueryMap) {
+      TagModel tag = TagModel.fromMap(tagQueryMap);
+      tagsList.add(tag);
+    });
+
+    return tagsList;
   }
 }

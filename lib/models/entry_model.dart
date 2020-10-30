@@ -1,4 +1,3 @@
-import 'package:clear_diary/database/database_instance.dart';
 import 'package:clear_diary/database/entry_contract.dart';
 import 'package:clear_diary/models/tag_model.dart';
 
@@ -22,11 +21,20 @@ class EntryModel {
       this.body,
       this.tags});
 
-  EntryModel.fromMap(Map<String, dynamic> map) {
-    EntryModel entry = EntryModel();
+  ///Constructs an [EntryModel] without tags.
+  EntryModel.fromMap(Map<String, dynamic> readOnlyMap) {
+    entryId = readOnlyMap[EntryContract.idColumn];
 
-    entry.entryId = map[EntryContract.idColumn];
+    dateCreated = DateTime.fromMillisecondsSinceEpoch(
+        readOnlyMap[EntryContract.dateCreatedColumn]);
+    dateModified = DateTime.fromMillisecondsSinceEpoch(
+        readOnlyMap[EntryContract.dateModifedColumn]);
+    dateAssigned = DateTime.fromMillisecondsSinceEpoch(
+        readOnlyMap[EntryContract.dateAssignedColumn]);
 
-    entry.dateCreated = map[EntryContract.dateCreatedColumn];
+    title = readOnlyMap[EntryContract.titleColumn];
+    body = readOnlyMap[EntryContract.bodyColumn];
+
+    tags = [];
   }
 }
