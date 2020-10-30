@@ -17,7 +17,8 @@ class Home extends StatelessWidget {
       body: HomeBody(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(context, DiaryEntry.id, arguments: null);
+          Navigator.pushNamed(context, DiaryEntry.id,
+              arguments: DiaryEntryArguments(null, null));
         },
         tooltip: Strings.addEntry,
         child: Icon(Icons.add),
@@ -27,7 +28,18 @@ class Home extends StatelessWidget {
 }
 
 ///Main body of initial screen
-class HomeBody extends StatelessWidget {
+class HomeBody extends StatefulWidget {
+  @override
+  _HomeBodyState createState() => _HomeBodyState();
+}
+
+class _HomeBodyState extends State<HomeBody> {
+  List<EntryModel> entriesList = [];
+
+  void homeScreenCallBack() async {
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     //todo: check if the query future is being called many times
@@ -36,12 +48,12 @@ class HomeBody extends StatelessWidget {
         builder:
             (BuildContext context, AsyncSnapshot<List<EntryModel>> snapshot) {
           if (snapshot.hasData) {
-            List<EntryModel> entries = snapshot.data;
+            entriesList = snapshot.data;
             return ListView.builder(
               padding: EdgeInsets.all(8.0),
-              itemCount: entries.length,
+              itemCount: entriesList.length,
               itemBuilder: (context, index) {
-                return EntryCard(entries[index]);
+                return EntryCard(entriesList[index], homeScreenCallBack);
               },
             );
           } else if (snapshot.hasError) {
@@ -95,8 +107,9 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
 ///Card representing a single Entry
 class EntryCard extends StatelessWidget {
   final EntryModel entry;
+  final Function callBack;
 
-  EntryCard(this.entry);
+  EntryCard(this.entry, this.callBack);
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +120,8 @@ class EntryCard extends StatelessWidget {
       child: InkWell(
         splashColor: Values.cardColor,
         onTap: () {
-          Navigator.pushNamed(context, DiaryEntry.id, arguments: entry);
+          Navigator.pushNamed(context, DiaryEntry.id,
+              arguments: DiaryEntryArguments(entry, callBack));
         },
         child: Container(
           child: ListTile(

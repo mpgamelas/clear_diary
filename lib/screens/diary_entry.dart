@@ -38,6 +38,7 @@ class _DiaryEntryBodyState extends State<DiaryEntryBody> {
   final String entryBodyKey = 'entry_body';
 
   EntryModel argumentPassed;
+  Function callBack;
   DateTime defaultDate = DateTime.now();
   String defaultTitle = '';
   List<TagModel> defaultTags = [];
@@ -56,10 +57,13 @@ class _DiaryEntryBodyState extends State<DiaryEntryBody> {
   ///Used to set the fields to default values
   void getPassedEntry() {
     try {
-      argumentPassed = ModalRoute.of(context).settings.arguments;
+      DiaryEntryArguments args = ModalRoute.of(context).settings.arguments;
+      argumentPassed = args.entry;
+      callBack = args.callBack;
     } catch (e) {
       print(e);
       argumentPassed = null;
+      callBack = null;
     }
 
     bool isUpdate = argumentPassed != null && argumentPassed.entryId > 0;
@@ -100,7 +104,10 @@ class _DiaryEntryBodyState extends State<DiaryEntryBody> {
         EntryContract.save(currentEntry);
       }
 
-      Navigator.pop(context);
+      if (callBack != null) {
+        callBack();
+      }
+      Navigator.of(context).pop(true);
     }
   }
 
@@ -170,4 +177,11 @@ class _DiaryEntryBodyState extends State<DiaryEntryBody> {
       ],
     );
   }
+}
+
+class DiaryEntryArguments {
+  EntryModel entry;
+  Function callBack;
+
+  DiaryEntryArguments(this.entry, this.callBack);
 }

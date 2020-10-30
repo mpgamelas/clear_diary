@@ -16,6 +16,7 @@ class EntryContract {
   static const bodyColumn = 'body';
 
   ///Inserts or update an Entry
+  ///todo: can be refactored here.
   static void save(EntryModel entry) async {
     Database db = await DatabaseInstance.instance.database;
     var map = <String, dynamic>{};
@@ -54,12 +55,49 @@ class EntryContract {
         throw Exception(debugInfo);
       }
 
+      //saves on entryXtags table
       for (int tagId in tagIdsInserted) {
         await EntryTagContract.save(idEntryInserted, tagId);
       }
     } else {
+      //Update the entry table
       map[idColumn] = entry.entryId;
-      //todo:finish update here
+      map[dateCreatedColumn] = entry.dateCreated.millisecondsSinceEpoch;
+      map[dateModifedColumn] = DateTime.now().millisecondsSinceEpoch;
+      map[dateAssignedColumn] = entry.dateAssigned.millisecondsSinceEpoch;
+      map[titleColumn] = entry.title;
+      map[bodyColumn] = entry.body;
+      int rowsUpdated = await db.update(entry_table, map,
+          where: '$idColumn = ?', whereArgs: [entry.entryId]);
+      if (rowsUpdated == null || rowsUpdated <= 0) {
+        throw 'Error on updating entry!';
+      }
+
+      //Updates each tag on the new entry, adding them on the tags table if it
+      //doesn't exists.
+      List<TagModel> tagList = entry.tags;
+      List<int> tagIdsUpdated = [];
+      if (tagList != null && tagList.isNotEmpty) {
+        for (TagModel tag in tagList) {
+          int tagIdInserted = await TagContract.save(tag);
+
+          if (tagIdInserted == null || tagIdInserted <= 0) {
+            throw Exception('Invalid TagID!');
+          }
+          tagIdsUpdated.add(tagIdInserted);
+        }
+      }
+
+      //sanity check
+      if (tagList.length != tagIdsUpdated.length) {
+        String debugInfo = 'missing tagIDs on entry update!';
+        throw debugInfo;
+      }
+
+      //Updates the entryXTags table
+      for (int tagId in tagIdsUpdated) {
+        await EntryTagContract.save(entry.entryId, tagId);
+      }
     }
   }
 
@@ -81,7 +119,7 @@ class EntryContract {
           bodyColumn
         ],
         where: '$dateAssignedColumn BETWEEN ? AND ?',
-        orderBy: '$dateAssignedColumn ASC',
+        orderBy: '$dateAssignedColumn DESC',
         whereArgs: [startDate, endDate]);
 
     List<EntryModel> listEntries = [];

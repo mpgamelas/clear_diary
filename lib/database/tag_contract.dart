@@ -12,6 +12,7 @@ class TagContract {
   static const tagColumn = 'tag';
 
   ///Inserts or update a Tag, returns the rowID of the tag saved.
+  ///todo: can be refactored here.
   static Future<int> save(TagModel tagModel) async {
     Database db = await DatabaseInstance.instance.database;
     var map = <String, dynamic>{};
@@ -46,12 +47,19 @@ class TagContract {
 
       return idTagInserted;
     } else {
-      //todo: update not implemented yet
-      if (tagModel.tagId != null && tagModel.tagId > 0) {
-        return tagModel.tagId;
-      } else {
-        return -1;
+      map[tagIdColumn] = tagModel.tagId;
+      map[tagDateCreatedColumn] = tagModel.dateCreated.millisecondsSinceEpoch;
+      map[tagDateModifiedColumn] = DateTime.now().millisecondsSinceEpoch;
+      map[tagColumn] = tagModel.tag;
+
+      int rowsUpdated = await db.update(tags_table, map,
+          where: '$tagIdColumn = ?', whereArgs: [tagModel.tagId]);
+
+      if (rowsUpdated == null || rowsUpdated <= 0) {
+        throw 'Error on updating entry!';
       }
+
+      return tagModel.tagId;
     }
   }
 
@@ -71,14 +79,7 @@ class TagContract {
 
     List<TagModel> tagList = [];
     list.forEach((map) {
-      TagModel tag = TagModel(map[tagColumn]);
-      tag.tagId = map[tagIdColumn];
-      tag.dateCreated =
-          DateTime.fromMillisecondsSinceEpoch(map[tagDateCreatedColumn]);
-      tag.dateModified =
-          DateTime.fromMillisecondsSinceEpoch(map[tagDateModifiedColumn]);
-
-      tagList.add(tag);
+      tagList.add(TagModel.fromMap(map));
     });
 
     return tagList;
