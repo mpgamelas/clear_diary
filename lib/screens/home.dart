@@ -36,6 +36,7 @@ class HomeBody extends StatefulWidget {
 class _HomeBodyState extends State<HomeBody> {
   List<EntryModel> entriesList = [];
 
+  //todo: make it work
   void homeScreenCallBack() async {
     setState(() {});
   }

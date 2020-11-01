@@ -17,7 +17,7 @@ class EntryContract {
 
   ///Inserts or update an Entry
   ///todo: can be refactored here.
-  static void save(EntryModel entry) async {
+  static Future<void> save(EntryModel entry) async {
     Database db = await DatabaseInstance.instance.database;
     var map = <String, dynamic>{};
 
@@ -36,11 +36,16 @@ class EntryContract {
         throw Exception('Invalid ID of new Entry!: $idEntryInserted');
       }
 
-      List<TagModel> tagList = entry.tags;
+      List<TagModel> tagsList = entry.tags;
       List<int> tagIdsInserted = [];
-      if (tagList != null && tagList.isNotEmpty) {
-        for (TagModel tag in tagList) {
+      if (tagsList != null && tagsList.isNotEmpty) {
+        for (TagModel tag in tagsList) {
+          //todo: a strange error occurs in this loop during debug break only, possibly VM related?
+          //https://github.com/dart-lang/sdk/issues/35435
           int tagIdInserted = await TagContract.save(tag);
+
+          // await Future.delayed(Duration(seconds: 2));
+          // int tagIdInserted = 7;
 
           if (tagIdInserted == null || tagIdInserted <= 0) {
             throw Exception('Invalid TagID!');
@@ -50,7 +55,7 @@ class EntryContract {
       }
 
       //sanity check
-      if (tagList.length != tagIdsInserted.length) {
+      if (entry.tags.length != tagIdsInserted.length) {
         String debugInfo = 'missing tagIDs on entry insert!';
         throw Exception(debugInfo);
       }
@@ -109,7 +114,7 @@ class EntryContract {
     int startDate = start.millisecondsSinceEpoch;
     int endDate = end.millisecondsSinceEpoch;
 
-    List<Map<String, dynamic>> queryList = await db.query(entry_table,
+    List<Map<String, dynamic>> readOnlyList = await db.query(entry_table,
         columns: [
           idColumn,
           dateCreatedColumn,
@@ -121,6 +126,12 @@ class EntryContract {
         where: '$dateAssignedColumn BETWEEN ? AND ?',
         orderBy: '$dateAssignedColumn DESC',
         whereArgs: [startDate, endDate]);
+
+    List<Map<String, dynamic>> queryList = [];
+    readOnlyList.forEach((element) {
+      Map<String, dynamic> map = Map<String, dynamic>.from(element);
+      queryList.add(map);
+    });
 
     List<EntryModel> listEntries = [];
     for (Map<String, dynamic> map in queryList) {

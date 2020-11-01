@@ -29,16 +29,16 @@ class TagContract {
           conflictAlgorithm: ConflictAlgorithm.ignore);
 
       if (idTagInserted == null) {
-        List<Map<String, dynamic>> map = await db.query(tags_table,
+        List<Map<String, dynamic>> queryMap = await db.query(tags_table,
             columns: [tagIdColumn, tagColumn],
             where: '$tagColumn LIKE ?',
             whereArgs: [tagModel.tag]);
 
-        if (map.length > 1) {
+        if (queryMap.length > 1) {
           throw Exception('Duplicate tag in table: $tags_table');
         }
 
-        idTagInserted = map[0][tagIdColumn] as int;
+        idTagInserted = queryMap[0][tagIdColumn] as int;
       }
 
       if (idTagInserted == null || idTagInserted <= 0) {
@@ -99,7 +99,13 @@ class TagContract {
                                                     ${EntryTagContract.entryIdColumn} = ?
                                                 )
     ''';
-    var tagsQuery = await db.rawQuery(querySql, [entryId]);
+    var readOnlyList = await db.rawQuery(querySql, [entryId]);
+
+    List<Map<String, dynamic>> tagsQuery = [];
+    readOnlyList.forEach((element) {
+      Map<String, dynamic> map = Map<String, dynamic>.from(element);
+      tagsQuery.add(map);
+    });
 
     List<TagModel> tagsList = [];
     tagsQuery.forEach((tagQueryMap) {

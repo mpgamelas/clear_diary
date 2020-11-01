@@ -37,7 +37,7 @@ class _DiaryEntryBodyState extends State<DiaryEntryBody> {
   final String entryTagsKey = 'entry_tags';
   final String entryBodyKey = 'entry_body';
 
-  EntryModel argumentPassed;
+  EntryModel entryPassed;
   Function callBack;
   DateTime defaultDate = DateTime.now();
   String defaultTitle = '';
@@ -58,20 +58,20 @@ class _DiaryEntryBodyState extends State<DiaryEntryBody> {
   void getPassedEntry() {
     try {
       DiaryEntryArguments args = ModalRoute.of(context).settings.arguments;
-      argumentPassed = args.entry;
+      entryPassed = args.entry;
       callBack = args.callBack;
     } catch (e) {
       print(e);
-      argumentPassed = null;
+      entryPassed = null;
       callBack = null;
     }
 
-    bool isUpdate = argumentPassed != null && argumentPassed.entryId > 0;
+    bool isUpdate = entryPassed != null && entryPassed.entryId > 0;
     if (isUpdate) {
-      defaultDate = argumentPassed.dateAssigned;
-      defaultTitle = argumentPassed.title;
-      defaultTags = argumentPassed.tags;
-      defaultBody = argumentPassed.body;
+      defaultDate = entryPassed.dateAssigned;
+      defaultTitle = entryPassed.title;
+      defaultTags = entryPassed.tags;
+      defaultBody = entryPassed.body;
     } else {
       final now = DateTime.now();
       final lastMidnight = new DateTime(now.year, now.month, now.day);
@@ -80,7 +80,7 @@ class _DiaryEntryBodyState extends State<DiaryEntryBody> {
   }
 
   ///onClick method of Save button
-  void saveEntry() {
+  void saveEntry() async {
     if (_fbKey.currentState.saveAndValidate()) {
       DateTime entryDate = _fbKey.currentState.value[entryDateKey] as DateTime;
       String entryTitle = _fbKey.currentState.value[entryTitleKey] as String;
@@ -88,21 +88,17 @@ class _DiaryEntryBodyState extends State<DiaryEntryBody> {
           _fbKey.currentState.value[entryTagsKey] as List<TagModel>;
       String entryBody = _fbKey.currentState.value[entryBodyKey] as String;
 
-      bool isUpdate = argumentPassed != null && argumentPassed.entryId > 0;
-      if (isUpdate) {
-        //todo:update logic here, if it is necessary
+      bool isUpdate = entryPassed != null && entryPassed.entryId > 0;
 
-      } else {
-        EntryModel currentEntry = EntryModel(
-          dateCreated: DateTime.now(),
-          dateModified: DateTime.now(),
-          dateAssigned: entryDate,
-          title: entryTitle,
-          body: entryBody,
-          tags: entryTags,
-        );
-        EntryContract.save(currentEntry);
-      }
+      EntryModel updateEntry = EntryModel(
+        dateCreated: isUpdate ? entryPassed.dateCreated : DateTime.now(),
+        dateModified: DateTime.now(),
+        dateAssigned: entryDate,
+        title: entryTitle,
+        body: entryBody,
+        tags: entryTags,
+      );
+      await EntryContract.save(updateEntry);
 
       if (callBack != null) {
         callBack();
@@ -129,6 +125,16 @@ class _DiaryEntryBodyState extends State<DiaryEntryBody> {
           autovalidateMode: AutovalidateMode.disabled,
           child: Column(
             children: <Widget>[
+              FormBuilderCustomField(
+                attribute: entryTagsKey,
+                validators: [],
+                formField: FormField(
+                  enabled: true,
+                  builder: (FormFieldState<dynamic> field) {
+                    return TextFieldTags(field);
+                  },
+                ),
+              ),
               FormBuilderDateTimePicker(
                 attribute: entryDateKey,
                 inputType: InputType.date,
@@ -139,16 +145,6 @@ class _DiaryEntryBodyState extends State<DiaryEntryBody> {
                 attribute: entryTitleKey,
                 decoration: InputDecoration(labelText: Strings.entryTitle),
                 validators: [],
-              ),
-              FormBuilderCustomField(
-                attribute: entryTagsKey,
-                validators: [],
-                formField: FormField(
-                  enabled: true,
-                  builder: (FormFieldState<dynamic> field) {
-                    return TextFieldTags(field);
-                  },
-                ),
               ),
               FormBuilderTextField(
                 attribute: entryBodyKey,
