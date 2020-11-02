@@ -3,28 +3,42 @@ import 'package:clear_diary/models/entry_model.dart';
 import 'package:clear_diary/models/tag_model.dart';
 import 'package:clear_diary/values/strings.dart';
 import 'package:clear_diary/widgets/text_field_tags.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
-class DiaryEntry extends StatelessWidget {
+class DiaryEntry extends StatefulWidget {
   static const String id = 'diary_entry_screen';
 
+  final EntryModel entry;
+
+  DiaryEntry(this.entry);
+
+  @override
+  _DiaryEntryState createState() => _DiaryEntryState();
+}
+
+class _DiaryEntryState extends State<DiaryEntry> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text(Strings.newEntry),
+          title: Text(widget.entry.isRecorded()
+              ? Strings.updateEntry
+              : Strings.newEntry),
         ),
-        body: DiaryEntryBody(),
+        body: DiaryEntryBody(widget.entry),
       ),
     );
   }
 }
 
 class DiaryEntryBody extends StatefulWidget {
+  final EntryModel entry;
+
+  DiaryEntryBody(this.entry);
+
   @override
   _DiaryEntryBodyState createState() => _DiaryEntryBodyState();
 }
@@ -37,41 +51,24 @@ class _DiaryEntryBodyState extends State<DiaryEntryBody> {
   final String entryTagsKey = 'entry_tags';
   final String entryBodyKey = 'entry_body';
 
-  EntryModel entryPassed;
-  Function callBack;
   DateTime defaultDate = DateTime.now();
   String defaultTitle = '';
   List<TagModel> defaultTags = [];
   String defaultBody = '';
+  bool isUpdate = false;
 
   @override
   void initState() {
     super.initState();
 
-    //necessary to get arguments
-    // WidgetsBinding.instance.addPostFrameCallback((_) async {
-    //   getPassedEntry();
-    // });
-  }
-
-  ///Used to set the fields to default values
-  void getPassedEntry() {
-    try {
-      DiaryEntryArguments args = ModalRoute.of(context).settings.arguments;
-      entryPassed = args.entry;
-      callBack = args.callBack;
-    } catch (e) {
-      print(e);
-      entryPassed = null;
-      callBack = null;
-    }
-
-    bool isUpdate = entryPassed != null && entryPassed.entryId > 0;
+    //Initialize default values
+    final EntryModel entry = widget.entry;
+    isUpdate = entry.isRecorded();
     if (isUpdate) {
-      defaultDate = entryPassed.dateAssigned;
-      defaultTitle = entryPassed.title;
-      defaultTags = entryPassed.tags;
-      defaultBody = entryPassed.body;
+      defaultDate = entry.dateAssigned;
+      defaultTitle = entry.title;
+      defaultTags = entry.tags;
+      defaultBody = entry.body;
     } else {
       final now = DateTime.now();
       final lastMidnight = new DateTime(now.year, now.month, now.day);
@@ -88,10 +85,8 @@ class _DiaryEntryBodyState extends State<DiaryEntryBody> {
           _fbKey.currentState.value[entryTagsKey] as List<TagModel>;
       String entryBody = _fbKey.currentState.value[entryBodyKey] as String;
 
-      bool isUpdate = entryPassed != null && entryPassed.entryId > 0;
-
       EntryModel updateEntry = EntryModel(
-        dateCreated: isUpdate ? entryPassed.dateCreated : DateTime.now(),
+        dateCreated: isUpdate ? widget.entry.dateCreated : DateTime.now(),
         dateModified: DateTime.now(),
         dateAssigned: entryDate,
         title: entryTitle,
@@ -100,17 +95,12 @@ class _DiaryEntryBodyState extends State<DiaryEntryBody> {
       );
       await EntryContract.save(updateEntry);
 
-      if (callBack != null) {
-        callBack();
-      }
-      Navigator.of(context).pop(true);
+      Navigator.of(context).pop();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    getPassedEntry();
-
     return ListView(
       padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
       children: <Widget>[
@@ -173,11 +163,4 @@ class _DiaryEntryBodyState extends State<DiaryEntryBody> {
       ],
     );
   }
-}
-
-class DiaryEntryArguments {
-  EntryModel entry;
-  Function callBack;
-
-  DiaryEntryArguments(this.entry, this.callBack);
 }

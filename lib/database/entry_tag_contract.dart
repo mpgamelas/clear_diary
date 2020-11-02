@@ -1,7 +1,5 @@
 import 'package:clear_diary/database/entry_contract.dart';
 import 'package:clear_diary/database/tag_contract.dart';
-import 'package:clear_diary/models/entry_model.dart';
-import 'package:clear_diary/models/tag_model.dart';
 import 'package:sqflite/sqlite_api.dart';
 
 import 'database_instance.dart';

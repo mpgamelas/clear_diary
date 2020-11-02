@@ -17,8 +17,10 @@ class Home extends StatelessWidget {
       body: HomeBody(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(context, DiaryEntry.id,
-              arguments: DiaryEntryArguments(null, null));
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => DiaryEntry(EntryModel())),
+          );
         },
         tooltip: Strings.addEntry,
         child: Icon(Icons.add),
@@ -36,11 +38,6 @@ class HomeBody extends StatefulWidget {
 class _HomeBodyState extends State<HomeBody> {
   List<EntryModel> entriesList = [];
 
-  //todo: make it work
-  void homeScreenCallBack() async {
-    setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
     //todo: check if the query future is being called many times
@@ -54,7 +51,7 @@ class _HomeBodyState extends State<HomeBody> {
               padding: EdgeInsets.all(8.0),
               itemCount: entriesList.length,
               itemBuilder: (context, index) {
-                return EntryCard(entriesList[index], homeScreenCallBack);
+                return EntryCard(entriesList[index]);
               },
             );
           } else if (snapshot.hasError) {
@@ -108,9 +105,8 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
 ///Card representing a single Entry
 class EntryCard extends StatelessWidget {
   final EntryModel entry;
-  final Function callBack;
 
-  EntryCard(this.entry, this.callBack);
+  EntryCard(this.entry);
 
   @override
   Widget build(BuildContext context) {
@@ -121,8 +117,10 @@ class EntryCard extends StatelessWidget {
       child: InkWell(
         splashColor: Values.cardColor,
         onTap: () {
-          Navigator.pushNamed(context, DiaryEntry.id,
-              arguments: DiaryEntryArguments(entry, callBack));
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => DiaryEntry(entry)),
+          );
         },
         child: Container(
           child: ListTile(

@@ -51,7 +51,7 @@ class EntryContract {
 
       //saves on entryXtags table
       await Future.wait(tagIdsInserted
-          .map((idTag) => EntryTagContract.save(entry.entryId, idTag)));
+          .map((idTag) => EntryTagContract.save(idEntryInserted, idTag)));
     } else {
       //Update the entry table
       map[idColumn] = entry.entryId;

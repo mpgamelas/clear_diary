@@ -37,4 +37,9 @@ class EntryModel {
 
     tags = [];
   }
+
+  ///True if the entry has a valid ID.
+  bool isRecorded() {
+    return entryId != null && entryId > 0;
+  }
 }
