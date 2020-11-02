@@ -15,15 +15,10 @@ class TagContract {
   ///todo: can be refactored here.
   static Future<int> save(TagModel tagModel) async {
     Database db = await DatabaseInstance.instance.database;
-    var map = <String, dynamic>{};
 
     bool isInsert = tagModel.tagId == null || tagModel.tagId <= 0;
     if (isInsert) {
-      int milisegEpoch = DateTime.now().millisecondsSinceEpoch;
-      map[tagDateCreatedColumn] = milisegEpoch;
-      map[tagDateModifiedColumn] = milisegEpoch;
-
-      map[tagColumn] = tagModel.tag;
+      Map<String, dynamic> map = tagModel.toMapNew();
 
       int idTagInserted = await db.insert(tags_table, map,
           conflictAlgorithm: ConflictAlgorithm.ignore);
@@ -47,10 +42,7 @@ class TagContract {
 
       return idTagInserted;
     } else {
-      map[tagIdColumn] = tagModel.tagId;
-      map[tagDateCreatedColumn] = tagModel.dateCreated.millisecondsSinceEpoch;
-      map[tagDateModifiedColumn] = DateTime.now().millisecondsSinceEpoch;
-      map[tagColumn] = tagModel.tag;
+      Map<String, dynamic> map = tagModel.toMapModified();
 
       int rowsUpdated = await db.update(tags_table, map,
           where: '$tagIdColumn = ?', whereArgs: [tagModel.tagId]);

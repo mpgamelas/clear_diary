@@ -39,19 +39,8 @@ class EntryContract {
       List<TagModel> tagsList = entry.tags;
       List<int> tagIdsInserted = [];
       if (tagsList != null && tagsList.isNotEmpty) {
-        for (TagModel tag in tagsList) {
-          //todo: a strange error occurs in this loop during debug break only, possibly VM related?
-          //https://github.com/dart-lang/sdk/issues/35435
-          int tagIdInserted = await TagContract.save(tag);
-
-          // await Future.delayed(Duration(seconds: 2));
-          // int tagIdInserted = 7;
-
-          if (tagIdInserted == null || tagIdInserted <= 0) {
-            throw Exception('Invalid TagID!');
-          }
-          tagIdsInserted.add(tagIdInserted);
-        }
+        tagIdsInserted =
+            await Future.wait(tagsList.map((tag) => TagContract.save(tag)));
       }
 
       //sanity check
@@ -83,14 +72,8 @@ class EntryContract {
       List<TagModel> tagList = entry.tags;
       List<int> tagIdsUpdated = [];
       if (tagList != null && tagList.isNotEmpty) {
-        for (TagModel tag in tagList) {
-          int tagIdInserted = await TagContract.save(tag);
-
-          if (tagIdInserted == null || tagIdInserted <= 0) {
-            throw Exception('Invalid TagID!');
-          }
-          tagIdsUpdated.add(tagIdInserted);
-        }
+        tagIdsUpdated =
+            await Future.wait(tagList.map((tag) => TagContract.save(tag)));
       }
 
       //sanity check
@@ -100,9 +83,8 @@ class EntryContract {
       }
 
       //Updates the entryXTags table
-      for (int tagId in tagIdsUpdated) {
-        await EntryTagContract.save(entry.entryId, tagId);
-      }
+      await Future.wait(tagIdsUpdated
+          .map((idTag) => EntryTagContract.save(entry.entryId, idTag)));
     }
   }
 
@@ -133,14 +115,12 @@ class EntryContract {
       queryList.add(map);
     });
 
+    //todo: check if this code can be done in a single batch.
     List<EntryModel> listEntries = [];
     for (Map<String, dynamic> map in queryList) {
       EntryModel entry = EntryModel.fromMap(map);
-      listEntries.add(entry);
-    }
-
-    for (var entry in listEntries) {
       entry.tags = await TagContract.queryByEntryId(entry.entryId);
+      listEntries.add(entry);
     }
 
     return listEntries;
@@ -171,12 +151,6 @@ class EntryContract {
   //       await db.rawQuery('SELECT COUNT(*) FROM $entry_table'));
   // }
   //
-  // Future<int> update(Map<String, dynamic> row) async {
-  //   Database db = await instance.database;
-  //   int id = row[idColumn];
-  //   return await db
-  //       .update(entry_table, row, where: '$idColumn = ?', whereArgs: [id]);
-  // }
   //
   // Future<int> delete(int id) async {
   //   Database db = await instance.database;

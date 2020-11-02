@@ -44,5 +44,5 @@ class EntryTagContract {
     return idTagEntryInserted;
   }
 
-  static Future<List<TagModel>> query(String query) async {}
+  //static Future<List<TagModel>> query(String query) async {}
 }
