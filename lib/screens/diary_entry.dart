@@ -1,4 +1,5 @@
 import 'package:clear_diary/database/entry_contract.dart';
+import 'package:clear_diary/home_state.dart';
 import 'package:clear_diary/models/entry_model.dart';
 import 'package:clear_diary/models/tag_model.dart';
 import 'package:clear_diary/values/strings.dart';
@@ -6,6 +7,7 @@ import 'package:clear_diary/widgets/text_field_tags.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:provider/provider.dart';
 
 class DiaryEntry extends StatefulWidget {
   static const String id = 'diary_entry_screen';
@@ -86,6 +88,7 @@ class _DiaryEntryBodyState extends State<DiaryEntryBody> {
       String entryBody = _fbKey.currentState.value[entryBodyKey] as String;
 
       EntryModel updateEntry = EntryModel(
+        entryId: isUpdate ? widget.entry.entryId : null,
         dateCreated: isUpdate ? widget.entry.dateCreated : DateTime.now(),
         dateModified: DateTime.now(),
         dateAssigned: entryDate,
@@ -95,6 +98,8 @@ class _DiaryEntryBodyState extends State<DiaryEntryBody> {
       );
       await EntryContract.save(updateEntry);
 
+      Provider.of<HomeState>(context, listen: false)
+          .queryEntries(DateTime(2020), DateTime.now());
       Navigator.of(context).pop();
     }
   }

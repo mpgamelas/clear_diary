@@ -1,3 +1,4 @@
+import 'package:clear_diary/home_state.dart';
 import 'package:clear_diary/models/entry_model.dart';
 import 'package:clear_diary/screens/diary_entry.dart';
 import 'package:clear_diary/screens/home.dart';
@@ -5,8 +6,6 @@ import 'package:clear_diary/screens/preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:preferences/preferences.dart';
 import 'package:provider/provider.dart';
-
-import 'global_state.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,7 +15,7 @@ void main() async {
   PrefService.setDefaultValues({'user_description': 'This is my description!'});
 
   runApp(ChangeNotifierProvider(
-    create: (_) => GlobalState(),
+    create: (_) => HomeState(),
     child: DiaryApp(),
   ));
 }

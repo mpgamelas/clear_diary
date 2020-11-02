@@ -1,4 +1,4 @@
-import 'package:clear_diary/database/entry_contract.dart';
+import 'package:clear_diary/home_state.dart';
 import 'package:clear_diary/models/entry_model.dart';
 import 'package:clear_diary/screens/diary_entry.dart';
 import 'package:clear_diary/screens/preferences.dart';
@@ -6,6 +6,7 @@ import 'package:clear_diary/values/strings.dart';
 import 'package:clear_diary/values/values.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class Home extends StatelessWidget {
   static const String id = 'home_screen';
@@ -36,35 +37,19 @@ class HomeBody extends StatefulWidget {
 }
 
 class _HomeBodyState extends State<HomeBody> {
-  List<EntryModel> entriesList = [];
-
   @override
   Widget build(BuildContext context) {
-    //todo: check if the query future is being called many times
-    return FutureBuilder<List<EntryModel>>(
-        future: EntryContract.queryByDate(DateTime(2020), DateTime.now()),
-        builder:
-            (BuildContext context, AsyncSnapshot<List<EntryModel>> snapshot) {
-          if (snapshot.hasData) {
-            entriesList = snapshot.data;
-            return ListView.builder(
-              padding: EdgeInsets.all(8.0),
-              itemCount: entriesList.length,
-              itemBuilder: (context, index) {
-                return EntryCard(entriesList[index]);
-              },
-            );
-          } else if (snapshot.hasError) {
-            //todo: log this error somewhere
-            return Center(
-              child: Text(Strings.anErrorOcurred),
-            );
-          } else {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-        });
+    return Consumer<HomeState>(
+      builder: (context, global, child) {
+        return ListView.builder(
+          padding: EdgeInsets.all(8.0),
+          itemCount: global.homeEntriesList.length,
+          itemBuilder: (context, index) {
+            return EntryCard(global.homeEntriesList[index]);
+          },
+        );
+      },
+    );
   }
 }
 
