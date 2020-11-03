@@ -3,15 +3,15 @@
 A diary app, made in Flutter. Mostly for learning purposes.
 
 # todo list
-- Everything
+- An easy way to backup/restore/retrieve the database.
+- Backups and exports to/from json and maybe txt or XLS?
 - Licensing.
+- Display entries by month.
 - Automated release and/or build by github if possible.
 - Multiple languages support.
-- Display entries by month.
-- Multiple entries per day.
 - Search by tag.
-- Backups and exports to/from json and maybe txt or XLS?
 - Google drive Backup.
+- Everything
 
 #Licensing
 - App icon image by FlatIcon: https://www.flaticon.com/home
