@@ -4,16 +4,9 @@ import 'package:clear_diary/screens/diary_entry.dart';
 import 'package:clear_diary/screens/home.dart';
 import 'package:clear_diary/screens/preferences.dart';
 import 'package:flutter/material.dart';
-import 'package:preferences/preferences.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  await PrefService.init(prefix: 'pref_');
-
-  PrefService.setDefaultValues({'user_description': 'This is my description!'});
-
   runApp(ChangeNotifierProvider(
     create: (_) => HomeState(),
     child: DiaryApp(),

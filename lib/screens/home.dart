@@ -54,7 +54,6 @@ class _HomeBodyState extends State<HomeBody> {
 }
 
 ///AppBar of the Initialscreen.
-///todo: remove the test icons
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
@@ -62,14 +61,13 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
       title: Text(Strings.homeScreenTitle),
       actions: <Widget>[
         IconButton(
-          icon: const Icon(Icons.add_alert),
-          tooltip: '',
-          onPressed: null,
-        ),
-        IconButton(
           icon: const Icon(Icons.search),
-          tooltip: Strings.settings,
-          onPressed: () {},
+          tooltip: Strings.search,
+          onPressed: () {
+            Scaffold.of(context).showSnackBar(SnackBar(
+              content: Text('Not implemented'),
+            ));
+          },
         ),
         IconButton(
           icon: const Icon(Icons.settings),

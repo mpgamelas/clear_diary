@@ -1,5 +1,11 @@
+import 'dart:io';
+
+import 'package:clear_diary/database/database_instance.dart';
+import 'package:clear_diary/values/strings.dart';
 import 'package:flutter/material.dart';
-import 'package:preferences/preferences.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:settings_ui/settings_ui.dart';
+import 'package:sqflite/sqlite_api.dart';
 
 class Preferences extends StatefulWidget {
   static const String id = 'preferences_screen';
@@ -13,195 +19,76 @@ class _PreferencesState extends State<Preferences> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Test preferences'),
+        title: Text(Strings.preferences),
       ),
-      body: PreferencePage([
-        PreferenceTitle('General'),
-        DropdownPreference(
-          'Start Page',
-          'start_page',
-          defaultVal: 'Timeline',
-          values: ['Posts', 'Timeline', 'Private Messages'],
-        ),
-        DropdownPreference<int>(
-          'Number of items',
-          'items_count',
-          defaultVal: 2,
-          displayValues: ['One', 'Two', 'Three', 'Four'],
-          values: [1, 2, 3, 4],
-        ),
-        PreferenceTitle('Personalization'),
-        RadioPreference(
-          'Light Theme',
-          'light',
-          'ui_theme',
-          isDefault: true,
-          onSelect: () {},
-        ),
-        RadioPreference(
-          'Dark Theme',
-          'dark',
-          'ui_theme',
-          onSelect: () {},
-        ),
-        PreferenceTitle('Messaging'),
-        PreferencePageLink(
-          'Notifications',
-          leading: Icon(Icons.message),
-          trailing: Icon(Icons.keyboard_arrow_right),
-          page: PreferencePage([
-            PreferenceTitle('New Posts'),
-            SwitchPreference(
-              'New Posts from Friends',
-              'notification_newpost_friend',
-              defaultVal: true,
-            ),
-            PreferenceTitle('Private Messages'),
-            SwitchPreference(
-              'Private Messages from Friends',
-              'notification_pm_friend',
-              defaultVal: true,
-            ),
-            SwitchPreference(
-              'Private Messages from Strangers',
-              'notification_pm_stranger',
-              onEnable: () async {
-                // Write something in Firestore or send a request
-                await Future.delayed(Duration(seconds: 1));
+      body: PreferenceBody(),
+    );
+  }
+}
 
-                print('Enabled Notifications for PMs from Strangers!');
-              },
-              onDisable: () async {
-                // Write something in Firestore or send a request
-                await Future.delayed(Duration(seconds: 1));
+class PreferenceBody extends StatefulWidget {
+  @override
+  _PreferenceBodyState createState() => _PreferenceBodyState();
+}
 
-                // No Connection? No Problem! Just throw an Exception with your custom message...
-                throw Exception('No Connection');
+class _PreferenceBodyState extends State<PreferenceBody> {
+  bool switchValue = false;
 
-                // Disabled Notifications for PMs from Strangers!
+  ///Creates a backup of the database in the external cache directory (wherever that is).
+  ///todo: make a proper backup in a better place. (seems hard).
+  Future<String> backupFunction() async {
+    List<Directory> dir = await getExternalCacheDirectories();
+    Database db = await DatabaseInstance.instance.database;
+    File dbOrigin = File(db.path);
+    File dirNew =
+        await dbOrigin.copy('${dir[0].path}/${DateTime.now().toString()}.db');
+
+    return dirNew.path;
+  }
+
+  ///todo: complete
+  Future<String> restoreFunction() async {
+    Database db = await DatabaseInstance.instance.database;
+    File dbOrigin = File(db.path);
+
+    DatabaseInstance.clearInstance();
+
+    List<Directory> dir = await getExternalCacheDirectories();
+    Directory dbBackupDir = dir[0];
+
+    String newDbPath = '${dir[0].path}/${DateTime.now().toString()}.db';
+    File dirNew = await dbOrigin.copy(newDbPath);
+
+    return dirNew.path;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsList(
+      sections: [
+        SettingsSection(
+          title: Strings.backupRestore,
+          tiles: [
+            SettingsTile(
+              title: Strings.backup,
+              leading: Icon(Icons.backup),
+              onTap: () async {
+                String path = await backupFunction();
+                String msg = 'Backup created at: ' + path;
+                Scaffold.of(context).showSnackBar(SnackBar(content: Text(msg)));
               },
             ),
-          ]),
+            SettingsTile(
+              title: Strings.restore,
+              leading: Icon(Icons.restore),
+              onTap: () async {
+                Scaffold.of(context)
+                    .showSnackBar(SnackBar(content: Text('Not implemented')));
+              },
+            ),
+          ],
         ),
-        PreferenceTitle('User'),
-        TextFieldPreference(
-          'Display Name',
-          'user_display_name',
-        ),
-        TextFieldPreference(
-          'E-Mail',
-          'user_email',
-          defaultVal: 'email@example.com',
-          validator: (str) {
-            if (true) {
-              return null;
-            }
-          },
-        ),
-        PreferenceText(
-          PrefService.getString('user_description', ignoreCache: true) ?? '',
-          style: TextStyle(color: Colors.grey),
-        ),
-        PreferenceDialogLink(
-          'Edit description',
-          dialog: PreferenceDialog(
-            [
-              TextFieldPreference(
-                'Description',
-                'user_description',
-                padding: const EdgeInsets.only(top: 8.0),
-                autofocus: true,
-                maxLines: 2,
-              )
-            ],
-            title: 'Edit description',
-            cancelText: 'Cancel',
-            submitText: 'Save',
-            onlySaveOnSubmit: true,
-          ),
-          onPop: () => setState(() {}),
-        ),
-        PreferenceTitle('Content'),
-        PreferenceDialogLink(
-          'Content Types',
-          dialog: PreferenceDialog(
-            [
-              CheckboxPreference('Text', 'content_show_text'),
-              CheckboxPreference('Images', 'content_show_image'),
-              CheckboxPreference('Music', 'content_show_audio')
-            ],
-            title: 'Enabled Content Types',
-            cancelText: 'Cancel',
-            submitText: 'Save',
-            onlySaveOnSubmit: true,
-          ),
-        ),
-        PreferenceTitle('More Dialogs'),
-        PreferenceDialogLink(
-          'Android\'s "ListPreference"',
-          dialog: PreferenceDialog(
-            [
-              RadioPreference(
-                  'Select me!', 'select_1', 'android_listpref_selected'),
-              RadioPreference(
-                  'Hello World!', 'select_2', 'android_listpref_selected'),
-              RadioPreference('Test', 'select_3', 'android_listpref_selected'),
-            ],
-            title: 'Select an option',
-            cancelText: 'Cancel',
-            submitText: 'Save',
-            onlySaveOnSubmit: true,
-          ),
-        ),
-        PreferenceDialogLink(
-          'Android\'s "ListPreference" with autosave',
-          dialog: PreferenceDialog(
-            [
-              RadioPreference(
-                  'Select me!', 'select_1', 'android_listpref_auto_selected'),
-              RadioPreference(
-                  'Hello World!', 'select_2', 'android_listpref_auto_selected'),
-              RadioPreference(
-                  'Test', 'select_3', 'android_listpref_auto_selected'),
-            ],
-            title: 'Select an option',
-            cancelText: 'Close',
-          ),
-        ),
-        PreferenceDialogLink(
-          'Android\'s "MultiSelectListPreference"',
-          dialog: PreferenceDialog(
-            [
-              CheckboxPreference('A enabled', 'android_multilistpref_a'),
-              CheckboxPreference('B enabled', 'android_multilistpref_b'),
-              CheckboxPreference('C enabled', 'android_multilistpref_c'),
-            ],
-            title: 'Select multiple options',
-            cancelText: 'Cancel',
-            submitText: 'Save',
-            onlySaveOnSubmit: true,
-          ),
-        ),
-        PreferenceHider([
-          PreferenceTitle('Experimental'),
-          SwitchPreference(
-            'Show Operating System',
-            'exp_showos',
-            desc: 'This option shows the users operating system in his profile',
-          )
-        ], '!advanced_enabled'), // Use ! to get reversed boolean values
-        PreferenceTitle('Advanced'),
-        CheckboxPreference(
-          'Enable Advanced Features',
-          'advanced_enabled',
-          onChange: () {
-            setState(() {});
-          },
-          onDisable: () {
-            PrefService.setBool('exp_showos', false);
-          },
-        )
-      ]),
+      ],
     );
   }
 }
