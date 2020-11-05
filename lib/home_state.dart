@@ -15,11 +15,17 @@ class HomeState with ChangeNotifier {
     this.queryEntries();
   }
 
+  ///Default query for entries in the current month to the last month of the year
   void queryEntries() {
-    ///todo: parameters here
-    queryEntriesRange(DateTime(2020), DateTime.now());
+    //todo: parameters here
+
+    DateTime now = DateTime.now();
+    DateTime currentMonthStart = DateTime(now.year, now.month);
+    DateTime currentYearEnd = DateTime(now.year, 12, 31, 11);
+    queryEntriesRange(currentMonthStart, currentYearEnd);
   }
 
+  ///Query entries by a date range.
   void queryEntriesRange(DateTime start, DateTime end) async {
     _homeEntriesList = await EntryContract.queryByDate(start, end);
 
