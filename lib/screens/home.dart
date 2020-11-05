@@ -41,13 +41,21 @@ class _HomeBodyState extends State<HomeBody> {
   Widget build(BuildContext context) {
     return Consumer<HomeState>(
       builder: (context, global, child) {
-        return ListView.builder(
-          padding: EdgeInsets.all(8.0),
-          itemCount: global.homeEntriesList.length,
-          itemBuilder: (context, index) {
-            return EntryCard(global.homeEntriesList[index]);
-          },
-        );
+        if (global.homeEntriesList == null) {
+          return Center(child: CircularProgressIndicator());
+        }
+
+        if (global.homeEntriesList.isNotEmpty) {
+          return ListView.builder(
+            padding: EdgeInsets.all(8.0),
+            itemCount: global.homeEntriesList.length,
+            itemBuilder: (context, index) {
+              return EntryCard(global.homeEntriesList[index]);
+            },
+          );
+        } else {
+          return Center(child: Text(Strings.noEntriesForPeriod));
+        }
       },
     );
   }
@@ -55,11 +63,37 @@ class _HomeBodyState extends State<HomeBody> {
 
 ///AppBar of the Initialscreen.
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
+  void _selectDate(BuildContext context) async {
+    DateTime now = DateTime.now();
+    DateTime currentMonthStart = DateTime(now.year, now.month);
+    DateTime currentYearEnd = DateTime(now.year, 12, 31, 11);
+
+    DateTimeRange picked = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(2010),
+      lastDate: DateTime(DateTime.now().year + 5),
+      initialDateRange: DateTimeRange(
+        end: currentYearEnd,
+        start: currentMonthStart,
+      ),
+    );
+
+    Provider.of<HomeState>(context, listen: false)
+        .queryEntriesRange(picked.start, picked.end);
+  }
+
   @override
   Widget build(BuildContext context) {
     return AppBar(
       title: Text(Strings.homeScreenTitle),
       actions: <Widget>[
+        IconButton(
+          icon: const Icon(Icons.calendar_today),
+          tooltip: Strings.setRangeDate,
+          onPressed: () {
+            _selectDate(context);
+          },
+        ),
         IconButton(
           icon: const Icon(Icons.search),
           tooltip: Strings.search,

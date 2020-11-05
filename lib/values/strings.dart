@@ -5,6 +5,9 @@ class Strings {
   static const String addEntry = 'Add entry';
   static const String settings = 'Settings';
   static const String search = 'Search';
+  static const String setRangeDate = 'Set Range of dates in the entry query';
+  static const String noEntriesForPeriod =
+      'No entries found for the chosen period!';
   static const String newEntry = 'New Entry';
   static const String updateEntry = 'Update Entry';
   static const String entryTitle = 'Entry Title';
@@ -15,6 +18,7 @@ class Strings {
   static const String addNewTag = 'Add New Tag';
   static const String anErrorOcurred = 'An error has ocurred!';
 
+  //Preferences screen strings
   static const String preferences = 'Preferences';
   static const String backup = 'Backup';
   static const String restore = 'Restore';
