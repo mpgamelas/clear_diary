@@ -98,8 +98,7 @@ class _DiaryEntryBodyState extends State<DiaryEntryBody> {
       );
       await EntryContract.save(updateEntry);
 
-      Provider.of<HomeState>(context, listen: false)
-          .queryEntries(DateTime(2020), DateTime.now());
+      Provider.of<HomeState>(context, listen: false).queryEntries();
       Navigator.of(context).pop();
     }
   }

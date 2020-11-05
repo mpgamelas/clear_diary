@@ -19,4 +19,12 @@ class Strings {
   static const String backup = 'Backup';
   static const String restore = 'Restore';
   static const String backupRestore = 'Backup and Restore';
+  static const String selectDbToRestore = 'Select Database to restore';
+  static const String deleteBackups = 'Delete all Backups';
+  static const String noFilesBackupFolder = 'No files in backups folder!';
+  static const String noFilesChosenDialog = 'No file chosen in dialog!';
+  static const String errorRestoreBackup = 'Error on restoring Backup!';
+  static const String restoreSuccessful = 'Restore Successful';
+  static const String backupsDeleted = 'Backups deleted!';
+  static const String backupCreatedAt = 'Backup created at: ';
 }

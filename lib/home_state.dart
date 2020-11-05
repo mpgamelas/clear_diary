@@ -12,10 +12,15 @@ class HomeState with ChangeNotifier {
   List<EntryModel> get homeEntriesList => _homeEntriesList;
 
   HomeState() {
-    this.queryEntries(DateTime(2020), DateTime.now());
+    this.queryEntries();
   }
 
-  void queryEntries(DateTime start, DateTime end) async {
+  void queryEntries() {
+    ///todo: parameters here
+    queryEntriesRange(DateTime(2020), DateTime.now());
+  }
+
+  void queryEntriesRange(DateTime start, DateTime end) async {
     _homeEntriesList = await EntryContract.queryByDate(start, end);
 
     notifyListeners();
