@@ -31,4 +31,7 @@ class Strings {
   static const String restoreSuccessful = 'Restore Successful';
   static const String backupsDeleted = 'Backups deleted!';
   static const String backupCreatedAt = 'Backup created at: ';
+
+  static const String searchForAnEntry = 'Search for an Entry';
+  static const String Tag = 'Tag';
 }

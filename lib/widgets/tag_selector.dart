@@ -4,30 +4,19 @@ import 'package:clear_diary/values/strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tagging/flutter_tagging.dart' as Tagging;
 
-///Tag input field used in the [DiaryEntr] screen.
-class TextFieldTags extends StatefulWidget {
-  final FormFieldState<dynamic> formField;
+///Tag input field. Cannot add new tags to selection.
+///todo: see if it can be merged with [TextFieldTags].
+class TagSelector extends StatefulWidget {
+  final Function onChangedCallback;
 
-  TextFieldTags(this.formField);
+  TagSelector({this.onChangedCallback});
 
   @override
-  _TextFieldTagsState createState() => _TextFieldTagsState();
+  _TagSelectorState createState() => _TagSelectorState();
 }
 
-class _TextFieldTagsState extends State<TextFieldTags> {
-  List<TagModel> _tagList;
-
-  @override
-  void initState() {
-    super.initState();
-    _tagList = widget.formField.value;
-  }
-
-  @override
-  void dispose() {
-    _tagList.clear();
-    super.dispose();
-  }
+class _TagSelectorState extends State<TagSelector> {
+  List<TagModel> _tagList = [];
 
   @override
   Widget build(BuildContext context) {
@@ -43,14 +32,14 @@ class _TextFieldTagsState extends State<TextFieldTags> {
         ),
       ),
       findSuggestions: TagContract.queryByName,
-      additionCallback: (value) {
-        DateTime now = DateTime.now();
-        return TagModel(value, dateCreated: now, dateModified: now);
-      },
-      onAdded: (tagModel) {
-        // api calls here, triggered when add to tag button is pressed
-        return tagModel;
-      },
+      // additionCallback: (value) {
+      //   DateTime now = DateTime.now();
+      //   return TagModel(value, dateCreated: now, dateModified: now);
+      // },
+      // onAdded: (tagModel) {
+      //   // api calls here, triggered when add to tag button is pressed
+      //   return tagModel;
+      // },
       configureSuggestion: (tagModel) {
         return Tagging.SuggestionConfiguration(
           title: Text(tagModel.tag),
@@ -78,9 +67,7 @@ class _TextFieldTagsState extends State<TextFieldTags> {
         );
       },
       onChanged: () {
-        setState(() {
-          widget.formField.didChange(_tagList);
-        });
+        widget.onChangedCallback(_tagList);
       },
     );
   }
