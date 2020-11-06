@@ -78,8 +78,10 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
     );
 
-    Provider.of<HomeState>(context, listen: false)
-        .setDateRange(picked.start, picked.end);
+    if (picked != null) {
+      Provider.of<HomeState>(context, listen: false)
+          .setDateRange(picked.start, picked.end);
+    }
   }
 
   @override
