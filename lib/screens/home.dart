@@ -2,10 +2,10 @@ import 'package:clear_diary/home_state.dart';
 import 'package:clear_diary/models/entry_model.dart';
 import 'package:clear_diary/screens/diary_entry.dart';
 import 'package:clear_diary/screens/preferences.dart';
+import 'package:clear_diary/screens/search_entry.dart';
 import 'package:clear_diary/values/strings.dart';
-import 'package:clear_diary/values/values.dart';
+import 'package:clear_diary/widgets/entry_card.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class Home extends StatelessWidget {
@@ -98,9 +98,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
           icon: const Icon(Icons.search),
           tooltip: Strings.search,
           onPressed: () {
-            Scaffold.of(context).showSnackBar(SnackBar(
-              content: Text('Not implemented'),
-            ));
+            Navigator.pushNamed(context, SearchEntry.id);
           },
         ),
         IconButton(
@@ -117,35 +115,4 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   //Necessary for PreferredSizeWidget, maybe remove it later by embedding the appBar
   @override
   Size get preferredSize => new Size.fromHeight(kToolbarHeight);
-}
-
-///Card representing a single Entry
-class EntryCard extends StatelessWidget {
-  final EntryModel entry;
-
-  EntryCard(this.entry);
-
-  @override
-  Widget build(BuildContext context) {
-    String dateAssigned =
-        DateFormat(Values.dateFormat).format(entry.dateAssigned);
-
-    return Card(
-      child: InkWell(
-        splashColor: Values.cardColor,
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => DiaryEntry(entry)),
-          );
-        },
-        child: Container(
-          child: ListTile(
-            title: Text(entry.title),
-            subtitle: Text(dateAssigned),
-          ),
-        ),
-      ),
-    );
-  }
 }
