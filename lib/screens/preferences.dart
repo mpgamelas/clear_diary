@@ -249,19 +249,6 @@ class _PreferenceBodyState extends State<PreferenceBody> {
             ),
           ],
         ),
-        SettingsSection(
-          title: 'Debug',
-          tiles: [
-            SettingsTile(
-              title: 'Restore from JSON',
-              leading: Icon(Icons.restore_outlined),
-              onTap: () async {
-                var txt = await restoreFromJson();
-                Scaffold.of(context).showSnackBar(SnackBar(content: Text(txt)));
-              },
-            ),
-          ],
-        ),
       ],
     );
   }
