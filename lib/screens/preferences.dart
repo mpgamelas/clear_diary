@@ -1,6 +1,10 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:clear_diary/database/database_instance.dart';
+import 'package:clear_diary/database/entry_contract.dart';
+import 'package:clear_diary/models/entry_model.dart';
+import 'package:clear_diary/models/tag_model.dart';
 import 'package:clear_diary/values/strings.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
@@ -127,6 +131,90 @@ class _PreferenceBodyState extends State<PreferenceBody> {
     return backupDir;
   }
 
+  /*
+  ///Restores the database from json.
+  ///todo debug only, not working properly due to DB locking.
+  Future<String> restoreFromJson() async {
+    Database db = await DatabaseInstance.instance.database;
+    File dbOrigin = File(db.path);
+
+    Directory dbBackupDir = await getBackupDir();
+
+    List<FileSystemEntity> listFiles =
+        dbBackupDir.listSync(recursive: false, followLinks: false);
+
+    if (listFiles.isEmpty) {
+      return Strings.noFilesBackupFolder;
+    }
+
+    File backupChosen = File('${dbBackupDir.path}/out.txt');
+
+    if (backupChosen == null) {
+      return Strings.noFilesChosenDialog;
+    }
+
+    var json = await backupChosen.readAsString();
+    var entriesList = jsonToEntry(json);
+    int ggygft = 0;
+
+    //await Future.wait(entriesList.map((entry) => EntryContract.save(entry)));
+
+    return 'Sucess ${backupChosen.path}';
+  }
+
+  List<EntryModel> jsonToEntry(String json) {
+    var obj = jsonDecode(json).cast<Map<String, dynamic>>();
+
+    List<EntryModel> entriesList = [];
+    for (Map<String, dynamic> map in obj) {
+      String entryBody = map['ConteudoArquivo'];
+      String dateCreatedstr = map['DataCriado'];
+      String dateModifiedstr = map['DataModificado'];
+      String dateAssignedstr = map['DataRegistro'];
+      List<dynamic> tagsStrings = map['Tags'];
+
+      DateTime dateCreated = DateTime.tryParse(dateCreatedstr).toLocal();
+      DateTime dateModified = DateTime.tryParse(dateModifiedstr).toLocal();
+      DateTime dateAssigned = DateTime.tryParse(dateAssignedstr).toLocal();
+
+      DateTime now = DateTime.now();
+      List<TagModel> tagsList = tagsStrings
+          .map((e) => TagModel(
+                e.toString(),
+                dateCreated: now,
+                dateModified: now,
+              ))
+          .toList();
+
+      const Map<int, String> diasSemana = {
+        1: 'Segunda',
+        2: 'Terça',
+        3: 'Quarta',
+        4: 'Quinta',
+        5: 'Sexta',
+        6: 'Sábado',
+        7: 'Domingo',
+      };
+
+      String comp =
+          '${dateAssigned.day}/${dateAssigned.month}/${dateAssigned.year}';
+      String titulo = '${diasSemana[dateAssigned.weekday]}, Dia ' + comp;
+      EntryModel entry = EntryModel(
+        title: titulo,
+        body: entryBody,
+        dateCreated: dateCreated,
+        dateModified: dateModified,
+        dateAssigned: dateAssigned,
+        tags: tagsList,
+      );
+
+      entriesList.add(entry);
+    }
+    return entriesList;
+  }
+
+   */
+
   @override
   Widget build(BuildContext context) {
     return SettingsList(
@@ -168,8 +256,8 @@ class _PreferenceBodyState extends State<PreferenceBody> {
               title: 'Restore from JSON',
               leading: Icon(Icons.restore_outlined),
               onTap: () async {
-                Scaffold.of(context)
-                    .showSnackBar(SnackBar(content: Text('Not implemented')));
+                var txt = await restoreFromJson();
+                Scaffold.of(context).showSnackBar(SnackBar(content: Text(txt)));
               },
             ),
           ],
