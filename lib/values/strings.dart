@@ -32,6 +32,8 @@ class Strings {
   static const String backupsDeleted = 'Backups deleted!';
   static const String backupCreatedAt = 'Backup created at: ';
 
+  //Search screen strings
   static const String searchForAnEntry = 'Search for an Entry';
   static const String Tag = 'Tag';
+  static const String noResultsToShow = 'No results to show';
 }

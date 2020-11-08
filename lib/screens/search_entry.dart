@@ -1,6 +1,9 @@
+import 'package:clear_diary/models/entry_model.dart';
 import 'package:clear_diary/models/tag_model.dart';
 import 'package:clear_diary/values/strings.dart';
+import 'package:clear_diary/widgets/entry_card.dart';
 import 'package:clear_diary/widgets/tag_selector.dart';
+import 'package:clear_diary/database/entry_contract.dart';
 import 'package:flutter/material.dart';
 
 class SearchEntry extends StatelessWidget {
@@ -31,6 +34,8 @@ class _SearchBodyState extends State<SearchBody> {
   ];
   List<DropdownMenuItem<String>> _dropDownMenuItems;
 
+  List<EntryModel> searchResults = [];
+
   @override
   void initState() {
     super.initState();
@@ -42,9 +47,25 @@ class _SearchBodyState extends State<SearchBody> {
 
   @override
   Widget build(BuildContext context) {
+    Widget searchView;
+
+    if (searchResults.isEmpty) {
+      searchView = const Center(child: Text(Strings.noResultsToShow));
+    } else {
+      searchView = Expanded(
+        child: ListView.builder(
+          padding: EdgeInsets.all(8.0),
+          itemCount: searchResults.length,
+          itemBuilder: (context, index) {
+            return EntryCard(searchResults[index]);
+          },
+        ),
+      );
+    }
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: ListView(
+      child: Column(
         children: <Widget>[
           ListTile(
             title: Text('Search By: '),
@@ -57,6 +78,7 @@ class _SearchBodyState extends State<SearchBody> {
           TagSelector(
             onChangedCallback: onTagsSearchedChanged,
           ),
+          searchView,
         ],
       ),
     );
@@ -66,7 +88,10 @@ class _SearchBodyState extends State<SearchBody> {
     print("Selected $selectedOption");
   }
 
-  void onTagsSearchedChanged(List<TagModel> tagList) {
-    //todo: search by the tags
+  Future<void> onTagsSearchedChanged(List<TagModel> tagList) async {
+    var entriesList = await EntryContract.queryByTags(tagList);
+    setState(() {
+      searchResults = entriesList;
+    });
   }
 }

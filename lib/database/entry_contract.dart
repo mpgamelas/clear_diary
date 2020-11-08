@@ -17,6 +17,7 @@ class EntryContract {
 
   ///Inserts or update an Entry
   ///todo: can be refactored here.
+  ///todo: TAGS CAN BE DELETED FROM HERE CHECK
   static Future<void> save(EntryModel entry) async {
     Database db = await DatabaseInstance.instance.database;
     var map = <String, dynamic>{};
@@ -123,6 +124,44 @@ class EntryContract {
     }
 
     return listEntries;
+  }
+
+  ///Return a list of [EntryModel] which contains one or more of the tags in [tagList].
+  static Future<List<EntryModel>> queryByTags(List<TagModel> tagList) async {
+    Database db = await DatabaseInstance.instance.database;
+
+    StringBuffer stringBuffer = StringBuffer();
+    stringBuffer.write('(');
+    for (int i = 0; i < (tagList.length - 1); i++) {
+      stringBuffer.write('${tagList[i].tagId},');
+    }
+    stringBuffer.write('${tagList.last.tagId})');
+
+    String querySql = '''
+    SELECT * FROM $entry_table WHERE $idColumn IN (
+                                                  SELECT DISTINCT 
+                                                    ${EntryTagContract.entryIdColumn}
+                                                  FROM
+                                                    ${EntryTagContract.entry_tag_table}
+                                                  WHERE
+                                                    ${EntryTagContract.tagIdColumn} IN ${stringBuffer.toString()}
+                                                ) ORDER BY $dateAssignedColumn DESC
+    ''';
+
+    var readOnlyList = await db.rawQuery(querySql);
+
+    List<EntryModel> entriesRetrieved = [];
+    readOnlyList.forEach((element) {
+      Map<String, dynamic> map = Map<String, dynamic>.from(element);
+      EntryModel newEntry = EntryModel.fromMap(map);
+      entriesRetrieved.add(newEntry);
+    });
+
+    for (EntryModel entry in entriesRetrieved) {
+      entry.tags = await TagContract.queryByEntryId(entry.entryId);
+    }
+
+    return entriesRetrieved;
   }
 
   ///For testing purposes.
