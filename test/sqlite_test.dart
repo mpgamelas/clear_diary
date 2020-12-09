@@ -39,8 +39,8 @@ void main() async {
     }
   });
 
-  //Test Will fail if order changes
   test('Adding and removing Tag', () async {
+    await dbTest.execute('DELETE FROM ${TagContract.tags_table}');
     TagModel tagTest = TagModel.test(1);
     int tagIdCreated = await TagContract.save(tagTest, dbTest);
     expect(tagIdCreated, 1);
