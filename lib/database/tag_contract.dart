@@ -13,8 +13,10 @@ class TagContract {
 
   ///Inserts or update a Tag, returns the rowID of the tag saved.
   ///todo: can be refactored here.
-  static Future<int> save(TagModel tagModel) async {
-    Database db = await DatabaseInstance.instance.database;
+  static Future<int> save(TagModel tagModel, [Database db]) async {
+    if (db == null) {
+      db = await DatabaseInstance.instance.database;
+    }
 
     bool isInsert = tagModel.tagId == null || tagModel.tagId <= 0;
     if (isInsert) {
@@ -56,8 +58,10 @@ class TagContract {
   }
 
   ///Searches tags that match a certain [String].
-  static Future<List<TagModel>> queryByName(String query) async {
-    Database db = await DatabaseInstance.instance.database;
+  static Future<List<TagModel>> queryByName(String query, [Database db]) async {
+    if (db == null) {
+      db = await DatabaseInstance.instance.database;
+    }
 
     var list = await db.query(tags_table,
         columns: [

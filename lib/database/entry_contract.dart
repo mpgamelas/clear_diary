@@ -18,8 +18,10 @@ class EntryContract {
   ///Inserts or update an Entry
   ///todo: can be refactored here.
   ///todo: TAGS CAN BE DELETED FROM HERE CHECK
-  static Future<void> save(EntryModel entry) async {
-    Database db = await DatabaseInstance.instance.database;
+  static Future<void> save(EntryModel entry, [Database db]) async {
+    if (db == null) {
+      db = await DatabaseInstance.instance.database;
+    }
     var map = <String, dynamic>{};
 
     bool isInsert = entry.entryId == null || entry.entryId <= 0;

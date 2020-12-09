@@ -43,6 +43,7 @@ class _PreferenceBodyState extends State<PreferenceBody> {
   ///Creates a backup of the database in the external cache directory (wherever that is).
   ///todo: make a proper backup in a better place. (seems hard).
   ///todo: return a string with message to the user.
+  ///todo: This does not work, at all.
   Future<String> backupFunction() async {
     Directory dir = await getBackupDir();
     Database db = await DatabaseInstance.instance.database;
@@ -135,9 +136,6 @@ class _PreferenceBodyState extends State<PreferenceBody> {
   ///Restores the database from json.
   ///todo debug only, not working properly due to DB locking.
   Future<String> restoreFromJson() async {
-    Database db = await DatabaseInstance.instance.database;
-    File dbOrigin = File(db.path);
-
     Directory dbBackupDir = await getBackupDir();
 
     List<FileSystemEntity> listFiles =
@@ -155,9 +153,8 @@ class _PreferenceBodyState extends State<PreferenceBody> {
 
     var json = await backupChosen.readAsString();
     var entriesList = jsonToEntry(json);
-    int ggygft = 0;
 
-    //await Future.wait(entriesList.map((entry) => EntryContract.save(entry)));
+    await Future.wait(entriesList.map((entry) => EntryContract.save(entry)));
 
     return 'Sucess ${backupChosen.path}';
   }
@@ -212,7 +209,6 @@ class _PreferenceBodyState extends State<PreferenceBody> {
     }
     return entriesList;
   }
-
    */
 
   @override

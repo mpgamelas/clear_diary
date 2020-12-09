@@ -30,6 +30,13 @@ class TagModel extends Tagging.Taggable {
     tag = readOnlyMap[TagContract.tagColumn];
   }
 
+  TagModel.test(int index) {
+    DateTime origin = DateTime(2020, 1, 1);
+    dateCreated = origin.add(Duration(days: index));
+    dateModified = origin.add(Duration(days: (index + 1)));
+    tag = 'Tag $index';
+  }
+
   Map<String, dynamic> toMap() {
     bool idValid = this.tagId != null && this.tagId > 0;
 
