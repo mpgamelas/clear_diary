@@ -44,7 +44,7 @@ class EntryModel {
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = {
       EntryContract.dateCreatedColumn: this.dateCreated.millisecondsSinceEpoch,
-      EntryContract.dateModifedColumn: this.dateModified.millisecondsSinceEpoch,
+      EntryContract.dateModifedColumn: DateTime.now().millisecondsSinceEpoch,
       EntryContract.dateAssignedColumn:
           this.dateAssigned.millisecondsSinceEpoch,
       EntryContract.titleColumn: this.title,

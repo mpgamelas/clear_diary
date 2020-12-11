@@ -58,6 +58,11 @@ void main() async {
   test('Adding entry and delete Tag', () async {
     await addEntryDeleteTag(dbTest);
   });
+
+  //todo: here
+  // test('Adding entry with tag and add other entry with same tag', () async {
+  //
+  // });
 }
 
 Future<Database> initializeDatabase(DatabaseFactory factory) async {

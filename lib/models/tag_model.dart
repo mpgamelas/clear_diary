@@ -31,6 +31,11 @@ class TagModel extends Tagging.Taggable {
     tag = readOnlyMap[TagContract.tagColumn];
   }
 
+  ///True if the tag has a valid ID.
+  bool isRecorded() {
+    return tagId != null && tagId > 0;
+  }
+
   TagModel.test(int index) {
     DateTime origin = DateTime(2020, 1, 1);
     dateCreated = origin.add(Duration(days: index));
@@ -39,35 +44,16 @@ class TagModel extends Tagging.Taggable {
   }
 
   Map<String, dynamic> toMap() {
-    bool idValid = this.tagId != null && this.tagId > 0;
-
     Map<String, dynamic> map = {
       TagContract.tagDateCreatedColumn: this.dateCreated.millisecondsSinceEpoch,
-      TagContract.tagDateModifiedColumn:
-          this.dateModified.millisecondsSinceEpoch,
+      TagContract.tagDateModifiedColumn: DateTime.now().millisecondsSinceEpoch,
       TagContract.tagColumn: this.tag,
     };
 
-    if (idValid) {
+    if (this.isRecorded()) {
       map[TagContract.tagIdColumn] = this.tagId;
     }
 
-    return map;
-  }
-
-  ///Returns the [TagModel] with the Date Modified already set.
-  Map<String, dynamic> toMapModified() {
-    var map = this.toMap();
-    map[TagContract.tagDateModifiedColumn] =
-        DateTime.now().millisecondsSinceEpoch;
-    return map;
-  }
-
-  ///Returns the [TagModel] with the Date Modified and Date Created already set.
-  Map<String, dynamic> toMapNew() {
-    var map = this.toMapModified();
-    map[TagContract.tagDateCreatedColumn] =
-        DateTime.now().millisecondsSinceEpoch;
     return map;
   }
 }

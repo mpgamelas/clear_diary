@@ -12,49 +12,50 @@ class TagContract {
   static const tagColumn = 'tag';
 
   ///Inserts or update a Tag, returns the rowID of the tag saved.
-  ///todo: can be refactored here.
   static Future<int> save(TagModel tagModel, [Database db]) async {
     if (db == null) {
       db = await DatabaseInstance.instance.database;
     }
 
-    bool isInsert = tagModel.tagId == null || tagModel.tagId <= 0;
-    if (isInsert) {
-      Map<String, dynamic> map = tagModel.toMapNew();
-
-      int idTagInserted = await db.insert(tags_table, map,
+    var tagMap = tagModel.toMap();
+    int idTagUpserted;
+    if (!tagModel.isRecorded()) {
+      //On tag insert
+      //todo: replace by try catch
+      idTagUpserted = await db.insert(tags_table, tagMap,
           conflictAlgorithm: ConflictAlgorithm.ignore);
 
-      if (idTagInserted == null) {
+      //If the same tag tries to be inserted.
+      if (idTagUpserted == null || idTagUpserted < 0) {
         List<Map<String, dynamic>> queryMap = await db.query(tags_table,
             columns: [tagIdColumn, tagColumn],
             where: '$tagColumn LIKE ?',
             whereArgs: [tagModel.tag]);
-
-        if (queryMap.length > 1) {
-          throw Exception('Duplicate tag in table: $tags_table');
+        if (queryMap.length != 1) {
+          String debug =
+              'Error retrieving tag in table: $tags_table, Tags found: ${queryMap.length}';
+          throw debug;
         }
 
-        idTagInserted = queryMap[0][tagIdColumn] as int;
+        idTagUpserted = queryMap[0][tagIdColumn] as int;
       }
-
-      if (idTagInserted == null || idTagInserted <= 0) {
-        throw Exception('Invalid TagID!');
-      }
-
-      return idTagInserted;
     } else {
-      Map<String, dynamic> map = tagModel.toMapModified();
-
-      int rowsUpdated = await db.update(tags_table, map,
+      //On tag update
+      int rowsUpdated = await db.update(tags_table, tagMap,
           where: '$tagIdColumn = ?', whereArgs: [tagModel.tagId]);
 
       if (rowsUpdated == null || rowsUpdated <= 0) {
-        throw 'Error on updating entry!';
+        throw 'Error on updating tag!';
       }
 
-      return tagModel.tagId;
+      idTagUpserted = tagModel.tagId;
     }
+
+    if (idTagUpserted == null || idTagUpserted <= 0) {
+      throw 'Invalid TagID inserted!';
+    }
+
+    return idTagUpserted;
   }
 
   ///Searches tags that match a certain [String].
