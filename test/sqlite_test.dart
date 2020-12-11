@@ -11,6 +11,7 @@ import 'package:sqflite_common/sqlite_api.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:test/test.dart';
 
+///Some tests to check if the database is properly storing information.
 void main() async {
   // Init ffi loader if needed.
   sqfliteFfiInit();

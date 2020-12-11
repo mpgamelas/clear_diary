@@ -16,7 +16,6 @@ class EntryContract {
   static const bodyColumn = 'body';
 
   ///Inserts or update an Entry
-  ///todo: TAGS CAN BE DELETED FROM HERE CHECK
   static Future<void> save(EntryModel entry, [Database db]) async {
     if (db == null) {
       db = await DatabaseInstance.instance.database;

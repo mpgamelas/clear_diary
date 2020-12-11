@@ -28,15 +28,14 @@ class EntryTagContract {
       entriesMapsList.add(map);
     }
 
-    //Todo: do this in single transaction
-    List<int> entryTagsIdInserted = [];
+    Batch opBatch = db.batch();
     for (var map in entriesMapsList) {
-      int idTagEntryInserted = await db.insert(entry_tag_table, map,
+      opBatch.insert(entry_tag_table, map,
           conflictAlgorithm: ConflictAlgorithm.ignore);
-      entryTagsIdInserted.add(idTagEntryInserted);
     }
+    var listIdInserted = await opBatch.commit();
 
-    if (entryTagsIdInserted.length != tagsId.length) {
+    if (listIdInserted.length != tagsId.length) {
       throw Exception('Error on saving in EntryXTags table!');
     }
   }
