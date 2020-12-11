@@ -34,7 +34,7 @@ class TagContract {
         if (queryMap.length != 1) {
           String debug =
               'Error retrieving tag in table: $tags_table, Tags found: ${queryMap.length}';
-          throw debug;
+          throw Exception(debug);
         }
 
         idTagUpserted = queryMap[0][tagIdColumn] as int;

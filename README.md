@@ -3,8 +3,8 @@
 A diary app, made in Flutter. Mostly for learning purposes.
 
 # todo list
-- Backups and exports to/from json and maybe txt or XLS?
 - Dark Theme.
+- Backups and exports to/from json and maybe txt or XLS?
 - Licensing.
 - Display entries by month.
 - Automated release and/or build by github if possible.

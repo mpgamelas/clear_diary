@@ -21,6 +21,12 @@ class DiaryApp extends StatelessWidget {
       title: 'Clear Diary',
       theme: ThemeData(
         primarySwatch: Colors.teal,
+        brightness: Brightness.light,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      darkTheme: ThemeData(
+        primarySwatch: Colors.teal,
+        brightness: Brightness.dark,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       initialRoute: Home.id,
