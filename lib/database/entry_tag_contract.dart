@@ -11,8 +11,10 @@ class EntryTagContract {
   static const tagIdColumn = TagContract.tagIdColumn;
 
   ///Inserts or update the tags of an entry
-  static Future<int> save(int entryId, int tagId) async {
-    Database db = await DatabaseInstance.instance.database;
+  static Future<int> save(int entryId, int tagId, [Database db]) async {
+    if (db == null) {
+      db = await DatabaseInstance.instance.database;
+    }
     var map = <String, dynamic>{};
 
     map[entryIdColumn] = entryId;

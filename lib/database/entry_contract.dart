@@ -43,7 +43,7 @@ class EntryContract {
       List<int> tagIdsInserted = [];
       if (tagsList != null && tagsList.isNotEmpty) {
         tagIdsInserted =
-            await Future.wait(tagsList.map((tag) => TagContract.save(tag)));
+            await Future.wait(tagsList.map((tag) => TagContract.save(tag, db)));
       }
 
       //sanity check
@@ -54,7 +54,7 @@ class EntryContract {
 
       //saves on entryXtags table
       await Future.wait(tagIdsInserted
-          .map((idTag) => EntryTagContract.save(idEntryInserted, idTag)));
+          .map((idTag) => EntryTagContract.save(idEntryInserted, idTag, db)));
     } else {
       //Update the entry table
       map[idColumn] = entry.entryId;
@@ -75,7 +75,7 @@ class EntryContract {
       List<int> tagIdsUpdated = [];
       if (tagList != null && tagList.isNotEmpty) {
         tagIdsUpdated =
-            await Future.wait(tagList.map((tag) => TagContract.save(tag)));
+            await Future.wait(tagList.map((tag) => TagContract.save(tag, db)));
       }
 
       //sanity check
@@ -86,14 +86,16 @@ class EntryContract {
 
       //Updates the entryXTags table
       await Future.wait(tagIdsUpdated
-          .map((idTag) => EntryTagContract.save(entry.entryId, idTag)));
+          .map((idTag) => EntryTagContract.save(entry.entryId, idTag, db)));
     }
   }
 
   ///Return a list of [EntryModel] in the range of [start] and [end].
-  static Future<List<EntryModel>> queryByDate(
-      DateTime start, DateTime end) async {
-    Database db = await DatabaseInstance.instance.database;
+  static Future<List<EntryModel>> queryByDate(DateTime start, DateTime end,
+      [Database db]) async {
+    if (db == null) {
+      db = await DatabaseInstance.instance.database;
+    }
 
     int startDate = start.millisecondsSinceEpoch;
     int endDate = end.millisecondsSinceEpoch;
@@ -121,7 +123,7 @@ class EntryContract {
     List<EntryModel> listEntries = [];
     for (Map<String, dynamic> map in queryList) {
       EntryModel entry = EntryModel.fromMap(map);
-      entry.tags = await TagContract.queryByEntryId(entry.entryId);
+      entry.tags = await TagContract.queryByEntryId(entry.entryId, db);
       listEntries.add(entry);
     }
 
@@ -164,24 +166,6 @@ class EntryContract {
     }
 
     return entriesRetrieved;
-  }
-
-  ///For testing purposes.
-  static List<EntryModel> getMockEntries() {
-    List<EntryModel> listEntries = [];
-    for (int i = 1; i <= 30; i++) {
-      EntryModel entry = EntryModel();
-      entry.entryId = i;
-      entry.dateCreated = DateTime.now();
-      entry.dateModified = DateTime.now();
-      entry.dateAssigned = DateTime.now();
-      entry.title = 'DEBUG TITLE $i';
-      entry.body = 'DEBUG BODY $i';
-      entry.tags = [TagModel('tag$i'), TagModel('test'), TagModel('testet')];
-      listEntries.add(entry);
-    }
-
-    return listEntries;
   }
 
   //

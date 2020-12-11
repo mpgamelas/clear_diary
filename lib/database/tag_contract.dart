@@ -82,8 +82,11 @@ class TagContract {
   }
 
   ///Searches the tags that belong to a single [EntryModel] ID.
-  static Future<List<TagModel>> queryByEntryId(int entryId) async {
-    Database db = await DatabaseInstance.instance.database;
+  static Future<List<TagModel>> queryByEntryId(int entryId,
+      [Database db]) async {
+    if (db == null) {
+      db = await DatabaseInstance.instance.database;
+    }
 
     String querySql = '''
     SELECT * FROM $tags_table WHERE $tagIdColumn IN (

@@ -2,7 +2,7 @@ import 'package:clear_diary/database/entry_contract.dart';
 import 'package:clear_diary/models/tag_model.dart';
 
 class EntryModel {
-  int entryId = -1;
+  int _entryId = -1;
 
   DateTime dateCreated;
   DateTime dateModified;
@@ -12,18 +12,21 @@ class EntryModel {
   String body;
   List<TagModel> tags;
 
+  int get entryId => _entryId;
+
   EntryModel(
-      {this.entryId,
+      {int entryId,
       this.dateCreated,
       this.dateModified,
       this.dateAssigned,
       this.title,
       this.body,
-      this.tags});
+      this.tags})
+      : _entryId = entryId;
 
   ///Constructs an [EntryModel] without tags.
   EntryModel.fromMap(Map<String, dynamic> readOnlyMap) {
-    entryId = readOnlyMap[EntryContract.idColumn];
+    _entryId = readOnlyMap[EntryContract.idColumn];
 
     dateCreated = DateTime.fromMillisecondsSinceEpoch(
         readOnlyMap[EntryContract.dateCreatedColumn]);
@@ -49,11 +52,11 @@ class EntryModel {
     body = 'Body $index';
 
     if (index % 3 == 0) {
-      tags = [TagModel.test(1)];
-    } else if (index % 3 == 1) {
-      tags = [TagModel.test(1), TagModel.test(2)];
-    } else if (index % 3 == 2) {
       tags = [TagModel.test(1), TagModel.test(2), TagModel.test(3)];
+    } else if (index % 3 == 1) {
+      tags = [TagModel.test(1)];
+    } else if (index % 3 == 2) {
+      tags = [TagModel.test(1), TagModel.test(2)];
     }
   }
 

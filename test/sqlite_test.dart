@@ -1,7 +1,10 @@
 import 'dart:io';
 
 import 'package:clear_diary/database/database_scripts.dart';
+import 'package:clear_diary/database/entry_contract.dart';
+import 'package:clear_diary/database/entry_tag_contract.dart';
 import 'package:clear_diary/database/tag_contract.dart';
+import 'package:clear_diary/models/entry_model.dart';
 import 'package:clear_diary/models/tag_model.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common/sqlite_api.dart';
@@ -40,20 +43,19 @@ void main() async {
   });
 
   test('Adding and removing Tag', () async {
-    await dbTest.execute('DELETE FROM ${TagContract.tags_table}');
-    TagModel tagTest = TagModel.test(1);
-    int tagIdCreated = await TagContract.save(tagTest, dbTest);
-    expect(tagIdCreated, 1);
+    await addRemoveTag(dbTest);
+  });
 
-    List<TagModel> queryResults =
-        await TagContract.queryByName(tagTest.tag, dbTest);
-    expect(queryResults.length, 1);
-    expect(queryResults[0].tag, tagTest.tag);
-    expect(queryResults[0].tagId, 1);
+  test('Adding and removing Entry', () async {
+    await addRemoveEntries(dbTest);
+  });
 
-    await dbTest.execute('DELETE FROM ${TagContract.tags_table}');
-    var teste = await TagContract.queryByName(tagTest.tag, dbTest);
-    expect(teste.isEmpty, true);
+  test('Adding entry and updating body', () async {
+    await addEntryAndUpdate(dbTest);
+  });
+
+  test('Adding entry and delete Tag', () async {
+    await addEntryDeleteTag(dbTest);
   });
 }
 
@@ -91,4 +93,141 @@ Future<Database> initializeDatabase(DatabaseFactory factory) async {
       });
   var db = await factory.openDatabase(inMemoryDatabasePath, options: optionsDb);
   return db;
+}
+
+void cleanDatabase(Database dbTest) async {
+  await dbTest.execute('DELETE FROM ${EntryContract.entry_table}');
+  await dbTest.execute('DELETE FROM ${TagContract.tags_table}');
+  await dbTest.execute('DELETE FROM ${EntryTagContract.entry_tag_table}');
+
+  var entryQuery =
+      await dbTest.rawQuery('SELECT * FROM ${EntryContract.entry_table}');
+  expect(entryQuery.isEmpty, true);
+
+  var tagQueryTest =
+      await dbTest.rawQuery('SELECT * FROM ${TagContract.tags_table}');
+  expect(tagQueryTest.isEmpty, true);
+
+  var entryTagQuery = await dbTest
+      .rawQuery('SELECT * FROM ${EntryTagContract.entry_tag_table}');
+  expect(entryTagQuery.isEmpty, true);
+}
+
+void addRemoveTag(Database dbTest) async {
+  await dbTest.execute('DELETE FROM ${TagContract.tags_table}');
+  TagModel tagTest = TagModel.test(1);
+  int tagIdCreated = await TagContract.save(tagTest, dbTest);
+  expect(tagIdCreated, 1);
+
+  List<TagModel> queryResults =
+      await TagContract.queryByName(tagTest.tag, dbTest);
+  expect(queryResults.length, 1);
+  expect(queryResults[0].tag, tagTest.tag);
+  expect(queryResults[0].tagId, 1);
+
+  cleanDatabase(dbTest);
+}
+
+void addRemoveEntries(Database dbTest) async {
+  EntryModel entryTest1 = EntryModel.test(1);
+  EntryModel entryTest2 = EntryModel.test(2);
+  EntryModel entryTest3 = EntryModel.test(3);
+  await EntryContract.save(entryTest1, dbTest);
+  await EntryContract.save(entryTest2, dbTest);
+  await EntryContract.save(entryTest3, dbTest);
+
+  var dateOrigin = DateTime(2020, 1, 1);
+  var dateEnd = DateTime(2021, 1, 1);
+  List<EntryModel> queryResults =
+      await EntryContract.queryByDate(dateOrigin, dateEnd, dbTest);
+  expect(queryResults.length, 3);
+  expect(queryResults[0].body, entryTest3.body);
+  expect(queryResults[1].body, entryTest2.body);
+  expect(queryResults[2].body, entryTest1.body);
+
+  expect(queryResults[0].tags.length, 3);
+  expect(queryResults[1].tags.length, 2);
+  expect(queryResults[2].tags.length, 1);
+
+  cleanDatabase(dbTest);
+}
+
+void addEntryAndUpdate(Database dbTest) async {
+  EntryModel entryTest1 = EntryModel.test(1);
+  EntryModel entryTest2 = EntryModel.test(2);
+  EntryModel entryTest3 = EntryModel.test(3);
+  try {
+    await EntryContract.save(entryTest1, dbTest);
+    await EntryContract.save(entryTest2, dbTest);
+    await EntryContract.save(entryTest3, dbTest);
+  } catch (e) {
+    print(e.toString());
+  }
+
+  var dateOrigin = DateTime(2020, 1, 1);
+  var dateEnd = DateTime(2020, 1, 2);
+
+  var entryQuery = await EntryContract.queryByDate(dateOrigin, dateEnd, dbTest);
+  expect(entryQuery.length, 1);
+  expect(entryQuery[0].body, entryTest1.body);
+
+  var updateEntry = entryQuery[0];
+  updateEntry.body = 'Body 1 modified by test';
+  await EntryContract.save(updateEntry, dbTest);
+
+  var newEntryQuery =
+      await EntryContract.queryByDate(dateOrigin, dateEnd, dbTest);
+  expect(newEntryQuery.length, 1);
+  expect(newEntryQuery[0].body, updateEntry.body);
+
+  List<EntryModel> queryResults =
+      await EntryContract.queryByDate(DateTime(2020), DateTime(2021), dbTest);
+  expect(queryResults.length, 3);
+  expect(queryResults[0].body, entryTest3.body);
+  expect(queryResults[1].body, entryTest2.body);
+  expect(queryResults[2].body, updateEntry.body);
+
+  expect(queryResults[0].tags.length, 3);
+  expect(queryResults[1].tags.length, 2);
+  expect(queryResults[2].tags.length, 1);
+
+  cleanDatabase(dbTest);
+}
+
+void addEntryDeleteTag(Database dbTest) async {
+  EntryModel entryTest1 = EntryModel.test(1);
+
+  try {
+    await EntryContract.save(entryTest1, dbTest);
+  } catch (e) {
+    print(e.toString());
+  }
+
+  var dateOrigin = DateTime(2020, 1, 1);
+  var dateEnd = DateTime(2020, 1, 2);
+
+  var entryQuery = await EntryContract.queryByDate(dateOrigin, dateEnd, dbTest);
+  expect(entryQuery.length, 1);
+  expect(entryQuery[0].body, entryTest1.body);
+
+  var updateEntry = entryQuery[0];
+  updateEntry.body = 'Body 1 modified by test';
+  var newTags = [TagModel.test(5), TagModel.test(6)];
+  updateEntry.tags = newTags;
+  await EntryContract.save(updateEntry, dbTest);
+
+  var newEntryQuery =
+      await EntryContract.queryByDate(dateOrigin, dateEnd, dbTest);
+  expect(newEntryQuery.length, 1);
+  var newEntryUpdated = newEntryQuery[0];
+  var updatedTags = newEntryUpdated.tags;
+  expect(newEntryUpdated.body, updateEntry.body);
+
+  //failing from here on
+  expect(updatedTags.length, newTags.length);
+  for (int i = 0; i < updatedTags.length; i++) {
+    expect(updatedTags[i].tag, newTags[i].tag);
+  }
+
+  cleanDatabase(dbTest);
 }

@@ -22,16 +22,6 @@ class DatabaseInstance {
     return _database;
   }
 
-  // static void clearInstance() async {
-  //   try {
-  //     Database db = await DatabaseInstance.instance.database;
-  //     db.close();
-  //     db = null;
-  //   } catch (e) {
-  //     print(e);
-  //   }
-  // }
-
   // opens DB and creates it on the first run
   _initDatabase() async {
     // count the number of scripts to define the version of the database
