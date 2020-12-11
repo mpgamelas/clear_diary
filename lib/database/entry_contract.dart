@@ -16,78 +16,46 @@ class EntryContract {
   static const bodyColumn = 'body';
 
   ///Inserts or update an Entry
-  ///todo: can be refactored here.
   ///todo: TAGS CAN BE DELETED FROM HERE CHECK
   static Future<void> save(EntryModel entry, [Database db]) async {
     if (db == null) {
       db = await DatabaseInstance.instance.database;
     }
-    var map = <String, dynamic>{};
+    var map = entry.toMap();
 
-    bool isInsert = entry.entryId == null || entry.entryId <= 0;
-    if (isInsert) {
-      map[dateCreatedColumn] = entry.dateCreated.millisecondsSinceEpoch;
-      map[dateModifedColumn] = entry.dateModified.millisecondsSinceEpoch;
-      map[dateAssignedColumn] = entry.dateAssigned.millisecondsSinceEpoch;
-
-      map[titleColumn] = entry.title;
-      map[bodyColumn] = entry.body;
-
-      int idEntryInserted = await db.insert(entry_table, map);
-
-      if (idEntryInserted == null || idEntryInserted <= 0) {
-        throw Exception('Invalid ID of new Entry!: $idEntryInserted');
-      }
-
-      List<TagModel> tagsList = entry.tags;
-      List<int> tagIdsInserted = [];
-      if (tagsList != null && tagsList.isNotEmpty) {
-        tagIdsInserted =
-            await Future.wait(tagsList.map((tag) => TagContract.save(tag, db)));
-      }
-
-      //sanity check
-      if (entry.tags.length != tagIdsInserted.length) {
-        String debugInfo = 'missing tagIDs on entry insert!';
-        throw Exception(debugInfo);
-      }
-
-      //saves on entryXtags table
-      await Future.wait(tagIdsInserted
-          .map((idTag) => EntryTagContract.save(idEntryInserted, idTag, db)));
+    int idEntryInserted;
+    if (!entry.isRecorded()) {
+      //New Entry
+      idEntryInserted = await db.insert(entry_table, map);
     } else {
-      //Update the entry table
-      map[idColumn] = entry.entryId;
-      map[dateCreatedColumn] = entry.dateCreated.millisecondsSinceEpoch;
-      map[dateModifedColumn] = DateTime.now().millisecondsSinceEpoch;
-      map[dateAssignedColumn] = entry.dateAssigned.millisecondsSinceEpoch;
-      map[titleColumn] = entry.title;
-      map[bodyColumn] = entry.body;
+      //Update the entry
       int rowsUpdated = await db.update(entry_table, map,
           where: '$idColumn = ?', whereArgs: [entry.entryId]);
-      if (rowsUpdated == null || rowsUpdated <= 0) {
-        throw 'Error on updating entry!';
+      if (rowsUpdated == null || rowsUpdated != 1) {
+        throw 'Error on updating entry!Missing or invalid ID updated!';
       }
-
-      //Updates each tag on the new entry, adding them on the tags table if it
-      //doesn't exists.
-      List<TagModel> tagList = entry.tags;
-      List<int> tagIdsUpdated = [];
-      if (tagList != null && tagList.isNotEmpty) {
-        tagIdsUpdated =
-            await Future.wait(tagList.map((tag) => TagContract.save(tag, db)));
-      }
-
-      //sanity check
-      if (tagList.length != tagIdsUpdated.length) {
-        String debugInfo = 'missing tagIDs on entry update!';
-        throw debugInfo;
-      }
-
-      //Updates the entryXTags table
-      await Future.wait(tagIdsUpdated
-          .map((idTag) => EntryTagContract.save(entry.entryId, idTag, db)));
+      idEntryInserted = entry.entryId;
     }
+
+    if (idEntryInserted == null || idEntryInserted <= 0) {
+      throw Exception('Invalid ID of new Entry!: $idEntryInserted');
+    }
+
+    List<TagModel> tagsList = entry.tags;
+    List<int> tagIdsInserted = [];
+    if (tagsList != null && tagsList.isNotEmpty) {
+      tagIdsInserted =
+          await Future.wait(tagsList.map((tag) => TagContract.save(tag, db)));
+    }
+
+    //sanity check
+    if (entry.tags.length != tagIdsInserted.length) {
+      String debugInfo = 'missing tagIDs on entry insert!';
+      throw Exception(debugInfo);
+    }
+
+    //saves on entryXtags table
+    await EntryTagContract.save(idEntryInserted, tagIdsInserted, db);
   }
 
   ///Return a list of [EntryModel] in the range of [start] and [end].

@@ -41,6 +41,23 @@ class EntryModel {
     tags = [];
   }
 
+  Map<String, dynamic> toMap() {
+    Map<String, dynamic> map = {
+      EntryContract.dateCreatedColumn: this.dateCreated.millisecondsSinceEpoch,
+      EntryContract.dateModifedColumn: this.dateModified.millisecondsSinceEpoch,
+      EntryContract.dateAssignedColumn:
+          this.dateAssigned.millisecondsSinceEpoch,
+      EntryContract.titleColumn: this.title,
+      EntryContract.bodyColumn: this.body,
+    };
+
+    if (this.isRecorded()) {
+      map[EntryContract.idColumn] = this.entryId;
+    }
+
+    return map;
+  }
+
   ///Generates a new entry for testing
   EntryModel.test(int index) {
     DateTime origin = DateTime(2020, 1, 1);

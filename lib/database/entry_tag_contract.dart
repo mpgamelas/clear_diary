@@ -10,39 +10,43 @@ class EntryTagContract {
   static const entryIdColumn = EntryContract.idColumn;
   static const tagIdColumn = TagContract.tagIdColumn;
 
-  ///Inserts or update the tags of an entry
-  static Future<int> save(int entryId, int tagId, [Database db]) async {
+  ///Inserts or update the tags of an entry.
+  ///May also erase entries if the tag was removed.
+  static Future<void> save(int entryId, List<int> tagsId, [Database db]) async {
     if (db == null) {
       db = await DatabaseInstance.instance.database;
     }
-    var map = <String, dynamic>{};
 
-    map[entryIdColumn] = entryId;
-    map[tagIdColumn] = tagId;
+    await deleteByEntry(entryId, db); //delete all previous entries
 
-    int idTagEntryInserted = await db.insert(entry_tag_table, map,
-        conflictAlgorithm: ConflictAlgorithm.ignore);
-
-    //On fail of insert due to repeated entry
-    if (idTagEntryInserted == null) {
-      List<Map<String, dynamic>> map = await db.query(entry_tag_table,
-          columns: ['rowid', entryIdColumn, tagIdColumn],
-          where: '$entryIdColumn = ? AND $tagIdColumn = ?',
-          whereArgs: [entryId, tagId]);
-
-      if (map.length > 1) {
-        throw Exception('Duplicate entry in table: $entry_tag_table');
-      }
-
-      idTagEntryInserted = map[0]['rowid'] as int;
+    //Creates list of maps to be inserted.
+    List<Map<String, dynamic>> entriesMapsList = [];
+    for (int tagId in tagsId) {
+      var map = <String, dynamic>{};
+      map[entryIdColumn] = entryId;
+      map[tagIdColumn] = tagId;
+      entriesMapsList.add(map);
     }
 
-    if (idTagEntryInserted == null || idTagEntryInserted <= 0) {
-      throw Exception('Invalid EntryXTagID!');
+    //Todo: do this in single transaction
+    List<int> entryTagsIdInserted = [];
+    for (var map in entriesMapsList) {
+      int idTagEntryInserted = await db.insert(entry_tag_table, map,
+          conflictAlgorithm: ConflictAlgorithm.ignore);
+      entryTagsIdInserted.add(idTagEntryInserted);
     }
 
-    return idTagEntryInserted;
+    if (entryTagsIdInserted.length != tagsId.length) {
+      throw Exception('Error on saving in EntryXTags table!');
+    }
   }
 
-  //static Future<List<TagModel>> query(String query) async {}
+  ///Deletes all EntryXTags where the entryID matches and return the number of rows deleted.
+  static Future<int> deleteByEntry(int entryId, [Database db]) async {
+    if (db == null) {
+      db = await DatabaseInstance.instance.database;
+    }
+    return await db.delete(EntryTagContract.entry_tag_table,
+        where: '$entryIdColumn = ?', whereArgs: [entryId]);
+  }
 }
