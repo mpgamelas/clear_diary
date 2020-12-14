@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:clear_diary/State/home_state.dart';
+import 'package:clear_diary/State/theme_state.dart';
 import 'package:clear_diary/database/database_instance.dart';
 import 'package:clear_diary/database/entry_contract.dart';
 import 'package:clear_diary/models/entry_model.dart';
@@ -11,8 +13,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:sqflite/sqlite_api.dart';
 import 'package:provider/provider.dart';
-import 'package:clear_diary/home_state.dart';
 
+///Screen of preferences.
+///todo: refactor to make more sense here.
 class Preferences extends StatefulWidget {
   static const String id = 'preferences_screen';
 
@@ -39,6 +42,17 @@ class PreferenceBody extends StatefulWidget {
 
 class _PreferenceBodyState extends State<PreferenceBody> {
   bool switchValue = false;
+  String selectedTheme = 'System';
+  List<String> themeValues = ['System', 'Dark', 'Light'];
+  List<DropdownMenuItem<String>> _dropDownThemeValues;
+
+  @override
+  void initState() {
+    super.initState();
+    _dropDownThemeValues = themeValues.map((themeString) {
+      return DropdownMenuItem(value: themeString, child: new Text(themeString));
+    }).toList();
+  }
 
   ///Creates a backup of the database in the external cache directory (wherever that is).
   ///todo: make a proper backup in a better place. (seems hard).
@@ -245,7 +259,27 @@ class _PreferenceBodyState extends State<PreferenceBody> {
             ),
           ],
         ),
+        SettingsSection(
+          title: Strings.interfaceOptions,
+          tiles: [
+            SettingsTile(
+              title: Strings.appTheme,
+              leading: Icon(Icons.brightness_4),
+              trailing: DropdownButton<String>(
+                value: selectedTheme,
+                items: _dropDownThemeValues,
+                onChanged: changedDropDownTheme,
+              ),
+            ),
+          ],
+        ),
       ],
     );
+  }
+
+  //todo: store preference here.
+  void changedDropDownTheme(String selectedTheme) {
+    Provider.of<ThemeState>(context, listen: false)
+        .setModeString(selectedTheme);
   }
 }

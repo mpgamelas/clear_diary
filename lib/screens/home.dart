@@ -1,4 +1,4 @@
-import 'package:clear_diary/home_state.dart';
+import 'package:clear_diary/State/home_state.dart';
 import 'package:clear_diary/models/entry_model.dart';
 import 'package:clear_diary/screens/diary_entry.dart';
 import 'package:clear_diary/screens/preferences.dart';

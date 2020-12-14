@@ -1,7 +1,6 @@
+import 'package:clear_diary/database/entry_contract.dart';
+import 'package:clear_diary/models/entry_model.dart';
 import 'package:flutter/material.dart';
-
-import 'database/entry_contract.dart';
-import 'models/entry_model.dart';
 
 ///Holds the state for the Home screen
 ///Does not seem like the best idea, but as longs as it works it should be fine for now.
