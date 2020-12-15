@@ -58,6 +58,10 @@ void main() async {
   test('Adding entry and delete Tag', () async {
     await addEntryDeleteTag(dbTest);
   });
+
+  test('Search entry by multiple tags', () async {
+    await searchEntryMultipleTags(dbTest);
+  });
 }
 
 Future<Database> initializeDatabase(DatabaseFactory factory) async {
@@ -227,6 +231,52 @@ void addEntryDeleteTag(Database dbTest) async {
   expect(updatedTags.length, newTags.length);
   for (int i = 0; i < updatedTags.length; i++) {
     expect(updatedTags[i].tag, newTags[i].tag);
+  }
+
+  cleanDatabase(dbTest);
+}
+
+void searchEntryMultipleTags(Database dbTest) async {
+  List<EntryModel> listEntries = [];
+  int entrySize = 10;
+  for (int i = 0; i < entrySize; i++) {
+    listEntries.add(EntryModel.test(i));
+  }
+
+  EntryModel entryTest = EntryModel.test(1);
+  var newTag = TagModel.test(1);
+  newTag.tag = 'tagTestSearch';
+  var newTagsList = [newTag, TagModel.test(1)];
+  entryTest.tags = newTagsList;
+  entryTest.body = 'bodySearchedHere';
+
+  try {
+    await Future.wait(
+        listEntries.map((entry) => EntryContract.save(entry, dbTest)));
+  } catch (e) {
+    print(e.toString());
+  }
+
+  int idEntryInserted = await EntryContract.save(entryTest, dbTest);
+
+  var dateOrigin = DateTime(2019, 1, 1);
+  var dateEnd = DateTime(2021, 1, 2);
+
+  var entryQuery = await EntryContract.queryByDate(dateOrigin, dateEnd, dbTest);
+  expect(entryQuery.length, entrySize + 1);
+
+  var tagsToSearch = await TagContract.queryByEntryId(idEntryInserted, dbTest);
+
+  var secondQuery = await EntryContract.queryByTags(tagsToSearch, dbTest);
+  expect(secondQuery.length, 1);
+  expect(secondQuery.first.body, 'bodySearchedHere');
+  var tagsRetrieved = secondQuery.first.tags;
+
+  expect(tagsRetrieved.length, newTagsList.length);
+
+  for (var newTag in newTagsList) {
+    var listTagsStrings = tagsRetrieved.map((tag) => tag.tag).toList();
+    expect(listTagsStrings.contains(newTag.tag), true);
   }
 
   cleanDatabase(dbTest);

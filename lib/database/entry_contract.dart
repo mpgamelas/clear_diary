@@ -16,7 +16,7 @@ class EntryContract {
   static const bodyColumn = 'body';
 
   ///Inserts or update an Entry
-  static Future<void> save(EntryModel entry, [Database db]) async {
+  static Future<int> save(EntryModel entry, [Database db]) async {
     if (db == null) {
       db = await DatabaseInstance.instance.database;
     }
@@ -55,6 +55,8 @@ class EntryContract {
 
     //saves on entryXtags table
     await EntryTagContract.save(idEntryInserted, tagIdsInserted, db);
+
+    return idEntryInserted;
   }
 
   ///Return a list of [EntryModel] in the range of [start] and [end].
@@ -97,9 +99,12 @@ class EntryContract {
     return listEntries;
   }
 
-  ///Return a list of [EntryModel] which contains one or more of the tags in [tagList].
-  static Future<List<EntryModel>> queryByTags(List<TagModel> tagList) async {
-    Database db = await DatabaseInstance.instance.database;
+  ///Return a list of [EntryModel] which contains ALL the the tags in [tagList].
+  static Future<List<EntryModel>> queryByTags(List<TagModel> tagList,
+      [Database db]) async {
+    if (db == null) {
+      db = await DatabaseInstance.instance.database;
+    }
 
     StringBuffer stringBuffer = StringBuffer();
     stringBuffer.write('(');
@@ -108,15 +113,20 @@ class EntryContract {
     }
     stringBuffer.write('${tagList.last.tagId})');
 
+    //Ugly query, but it is the best i could find of, seems to be related to relational division.
+    //https://stackoverflow.com/questions/15977126/select-group-of-rows-that-match-all-items-in-a-list
+    //https://www.red-gate.com/simple-talk/sql/t-sql-programming/divided-we-stand-the-sql-of-relational-division/
     String querySql = '''
     SELECT * FROM $entry_table WHERE $idColumn IN (
-                                                  SELECT DISTINCT 
-                                                    ${EntryTagContract.entryIdColumn}
+                                                  SELECT ${EntryTagContract.entryIdColumn}
                                                   FROM
                                                     ${EntryTagContract.entry_tag_table}
                                                   WHERE
                                                     ${EntryTagContract.tagIdColumn} IN ${stringBuffer.toString()}
-                                                ) ORDER BY $dateAssignedColumn DESC
+                                                  GROUP BY (${EntryTagContract.entryIdColumn})
+                                                  HAVING COUNT(*) = ${tagList.length}
+                                                ) 
+                                                ORDER BY $dateAssignedColumn DESC
     ''';
 
     var readOnlyList = await db.rawQuery(querySql);
@@ -129,7 +139,7 @@ class EntryContract {
     });
 
     for (EntryModel entry in entriesRetrieved) {
-      entry.tags = await TagContract.queryByEntryId(entry.entryId);
+      entry.tags = await TagContract.queryByEntryId(entry.entryId, db);
     }
 
     return entriesRetrieved;
