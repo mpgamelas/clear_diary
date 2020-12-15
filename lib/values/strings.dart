@@ -43,4 +43,11 @@ class Strings {
   static const String searchForAnEntry = 'Search for an Entry';
   static const String Tag = 'Tag';
   static const String noResultsToShow = 'No results to show';
+
+  //Entry Card strings
+  static const String cardEntryDetails = 'Entry details:';
+  static const String cardEntryId = 'Entry Id: ';
+  static const String cardDateCreated = 'Date Created: ';
+  static const String cardDateModified = 'Date Modified: ';
+  static const String cardDateAssigned = 'Date Assigned: ';
 }
