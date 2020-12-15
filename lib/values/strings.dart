@@ -34,6 +34,11 @@ class Strings {
   static const String interfaceOptions = 'Interface Options';
   static const String appTheme = 'App theme:';
 
+  //Theme Strings
+  static const String systemTheme = 'System';
+  static const String darkTheme = 'Dark';
+  static const String lightTheme = 'Light';
+
   //Search screen strings
   static const String searchForAnEntry = 'Search for an Entry';
   static const String Tag = 'Tag';

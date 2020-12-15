@@ -15,7 +15,7 @@ import 'package:sqflite/sqlite_api.dart';
 import 'package:provider/provider.dart';
 
 ///Screen of preferences.
-///todo: refactor to make more sense here.
+///todo: refactor to make more sense here, put file access functions elsewhere.
 class Preferences extends StatefulWidget {
   static const String id = 'preferences_screen';
 
@@ -42,8 +42,9 @@ class PreferenceBody extends StatefulWidget {
 
 class _PreferenceBodyState extends State<PreferenceBody> {
   bool switchValue = false;
-  String selectedTheme = 'System';
-  List<String> themeValues = ['System', 'Dark', 'Light'];
+  String selectedTheme =
+      ThemeState.themeMap.values.toList(growable: false).first;
+  List<String> themeValues = ThemeState.themeMap.values.toList(growable: false);
   List<DropdownMenuItem<String>> _dropDownThemeValues;
 
   @override
@@ -52,6 +53,10 @@ class _PreferenceBodyState extends State<PreferenceBody> {
     _dropDownThemeValues = themeValues.map((themeString) {
       return DropdownMenuItem(value: themeString, child: new Text(themeString));
     }).toList();
+
+    ThemeMode currentTheme =
+        Provider.of<ThemeState>(context, listen: false).mode;
+    selectedTheme = ThemeState.themeMap[currentTheme];
   }
 
   ///Creates a backup of the database in the external cache directory (wherever that is).
@@ -277,8 +282,8 @@ class _PreferenceBodyState extends State<PreferenceBody> {
     );
   }
 
-  //todo: store preference here.
   void changedDropDownTheme(String selectedTheme) {
+    this.selectedTheme = selectedTheme;
     Provider.of<ThemeState>(context, listen: false)
         .setModeString(selectedTheme);
   }
