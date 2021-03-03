@@ -155,13 +155,6 @@ class _DiaryEntryBodyState extends State<DiaryEntryBody> {
               child: Text("Save"),
               onPressed: saveEntry,
             ),
-            SizedBox(width: 10.0),
-            RaisedButton(
-              child: Text("Reset"),
-              onPressed: () {
-                _fbKey.currentState.reset();
-              },
-            ),
           ],
         )
       ],
