@@ -1,4 +1,8 @@
+import 'dart:io';
+
+import 'package:clear_diary/values/strings.dart';
 import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'database_scripts.dart';
@@ -57,5 +61,52 @@ class DatabaseInstance {
       }
     });
     return db;
+  }
+
+  ///Return default backup directory
+  static Future<Directory> getBackupDir() async {
+    List<Directory> dir = await getExternalCacheDirectories();
+    Directory cacheDir = dir[0];
+    String newBackupDir = cacheDir.path + Platform.pathSeparator + 'backups';
+    Directory backupDir =
+    await Directory(newBackupDir).create(recursive: false);
+
+    return backupDir;
+  }
+
+  ///Delete all backups
+  static Future<void> deleteBackups() async {
+    Directory bkpDir = await getBackupDir();
+    bkpDir.deleteSync(recursive: true);
+  }
+
+  ///Creates Backup on default directory
+  static Future<String> backupData() async {
+    Directory dir = await getBackupDir();
+
+    Database db = await DatabaseInstance.instance.database;
+    if (db.isOpen) {
+      await db.close();
+    }
+    File dbOrigin = File(db.path);
+
+    String timeStamp = DateTime.now().toString();
+    String newBackupFile = dir.path + Platform.pathSeparator + '$timeStamp.db';
+    File dirNew = await dbOrigin.copy(newBackupFile);
+
+    if (!db.isOpen) {
+      db = null;
+      db = await DatabaseInstance.instance.database;
+    }
+
+    return dirNew.path;
+  }
+
+  ///Restores the database from a previous backup.
+  static Future<void> restoreFunction(File backupFile) async {
+    Database db = await DatabaseInstance.instance.database;
+    //todo: close connection?
+    File dbOrigin = File(db.path);
+    File dirNew = await backupFile.copy(dbOrigin.path);
   }
 }
