@@ -113,8 +113,21 @@ class _PreferenceBodyState extends State<PreferenceBody> {
     Scaffold.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
 
+  ///Opens dialog and restore a backup from the default folder
   void restoreData() async {
-    File fileChosen = await dialogChooseBackup();
+    Directory dbBackupDir = await DatabaseInstance.getBackupDir();
+    List<FileSystemEntity> listFiles =
+        dbBackupDir.listSync(recursive: false, followLinks: false);
+
+    if (listFiles.isEmpty) {
+      Scaffold.of(context).showSnackBar(
+        SnackBar(
+          content: Text(Strings.noFilesBackupFolder),
+        ),
+      );
+    }
+
+    File fileChosen = await dialogChooseBackup(listFiles);
     if (fileChosen == null) {
       Scaffold.of(context)
           .showSnackBar(SnackBar(content: Text(Strings.noFilesChosenDialog)));
@@ -123,25 +136,16 @@ class _PreferenceBodyState extends State<PreferenceBody> {
         await DatabaseInstance.restoreFunction(fileChosen);
       } catch (exc, stack) {
         //todo: log something
-        Scaffold.of(context).showSnackBar(SnackBar(content: Text(Strings.errorRestoreBackup)));
+        Scaffold.of(context)
+            .showSnackBar(SnackBar(content: Text(Strings.errorRestoreBackup)));
       }
 
-      //todo: test this here
       Provider.of<HomeState>(context, listen: false).queryEntries();
     }
   }
 
   ///Opens dialog for choosing a backupfile
-  Future<File> dialogChooseBackup() async {
-    Directory dbBackupDir = await DatabaseInstance.getBackupDir();
-
-    List<FileSystemEntity> listFiles =
-        dbBackupDir.listSync(recursive: false, followLinks: false);
-
-    if (listFiles.isEmpty) {
-      return null;
-    }
-
+  Future<File> dialogChooseBackup(List<FileSystemEntity> listFiles) async {
     File backupChosen = await showDialog<File>(
         context: context,
         builder: (BuildContext context) {
@@ -165,27 +169,7 @@ class _PreferenceBodyState extends State<PreferenceBody> {
     return backupChosen;
   }
 
-  ///Restores the database from a previous backup.
-  ///todo: put this on another place
-  Future<String> restoreFunction(File backupFile) async {
-    Database db = await DatabaseInstance.instance.database;
-
-    File dbOrigin = File(db.path);
-
-    File dirNew;
-    try {
-      dirNew = await backupFile.copy(dbOrigin.path);
-    } catch (e) {
-      //todo: log here
-      print(e);
-      return Strings.errorRestoreBackup;
-    }
-
-    Provider.of<HomeState>(context, listen: false).queryEntries();
-
-    return Strings.restoreSuccessful;
-  }
-
+  ///Deletes all backups from the folder
   void deleteData() async {
     await DatabaseInstance.deleteBackups();
     Scaffold.of(context)

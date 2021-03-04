@@ -20,7 +20,7 @@ class DatabaseInstance {
   static Database _database;
 
   Future<Database> get database async {
-    if (_database != null) return _database;
+    if (_database != null && _database.isOpen) return _database;
     // creates DB instance on first time
     _database = await _initDatabase();
     return _database;
@@ -105,7 +105,6 @@ class DatabaseInstance {
   ///Restores the database from a previous backup.
   static Future<void> restoreFunction(File backupFile) async {
     Database db = await DatabaseInstance.instance.database;
-    //todo: close connection?
     File dbOrigin = File(db.path);
     File dirNew = await backupFile.copy(dbOrigin.path);
   }
