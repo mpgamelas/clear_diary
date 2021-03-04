@@ -8,6 +8,8 @@ class Strings {
   static const String setRangeDate = 'Set Range of dates in the entry query';
   static const String noEntriesForPeriod =
       'No entries found for the chosen period!';
+
+  //New/Update entry screen
   static const String newEntry = 'New Entry';
   static const String updateEntry = 'Update Entry';
   static const String entryTitle = 'Entry Title';
@@ -17,6 +19,7 @@ class Strings {
   static const String selectTags = 'Select Tags';
   static const String addNewTag = 'Add New Tag';
   static const String anErrorOcurred = 'An error has ocurred!';
+  static const String save = 'Save';
 
   //Preferences screen strings
   static const String preferences = 'Preferences';

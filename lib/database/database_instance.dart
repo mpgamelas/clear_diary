@@ -103,6 +103,8 @@ class DatabaseInstance {
   }
 
   ///Restores the database from a previous backup.
+  ///Check https://github.com/tekartik/sqflite/blob/master/sqflite/doc/opening_asset_db.md
+  ///for a better solution?
   static Future<void> restoreFunction(File backupFile) async {
     Database db = await DatabaseInstance.instance.database;
     File dbOrigin = File(db.path);

@@ -4,35 +4,22 @@ import 'package:clear_diary/values/strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tagging/flutter_tagging.dart' as Tagging;
 
-///Tag input field used in the [DiaryEntr] screen.
+///Tag input field used in the [DiaryEntry] screen.
 class TextFieldTags extends StatefulWidget {
-  final FormFieldState<dynamic> formField;
+  final List<TagModel> tagList;
 
-  TextFieldTags(this.formField);
+  TextFieldTags(this.tagList);
 
   @override
   _TextFieldTagsState createState() => _TextFieldTagsState();
 }
 
 class _TextFieldTagsState extends State<TextFieldTags> {
-  List<TagModel> _tagList;
-
-  @override
-  void initState() {
-    super.initState();
-    _tagList = widget.formField.value;
-  }
-
-  @override
-  void dispose() {
-    _tagList.clear();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     return Tagging.FlutterTagging<TagModel>(
-      initialItems: _tagList,
+      initialItems: widget.tagList,
       textFieldConfiguration: Tagging.TextFieldConfiguration(
         decoration: InputDecoration(
           border: InputBorder.none,
@@ -76,11 +63,6 @@ class _TextFieldTagsState extends State<TextFieldTags> {
           labelStyle: TextStyle(color: Colors.white),
           deleteIconColor: Colors.white,
         );
-      },
-      onChanged: () {
-        setState(() {
-          widget.formField.didChange(_tagList);
-        });
       },
     );
   }
