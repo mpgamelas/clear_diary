@@ -2,7 +2,7 @@
 
 A diary app, made in Flutter. Mostly for learning purposes.
 
-# todo list
+# Todo list
 Moved to trello for now.
 
 https://trello.com/b/5KfvhdGn/clear-diary

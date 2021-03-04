@@ -1,16 +1,18 @@
 import 'package:clear_diary/database/entry_tag_contract.dart';
+import 'package:clear_diary/database/log_contract.dart';
 import 'package:clear_diary/database/tag_contract.dart';
 
 import 'entry_contract.dart';
 
 ///Map with the scripts used for each schema version
 final Map<int, List<String>> migrationScripts = {
-  1: [createTableEntry, createTableTag, createTableEntryTag]
+  1: [createTableEntry, createTableTag, createTableEntryTag],
+  2: [createTableLogger],
 };
 
 final List<String> configureScripts = [
   pragmaCaseInsensitive,
-  pragmaForeignKeys
+  pragmaForeignKeys,
 ];
 
 const String createTableEntry = '''
@@ -46,6 +48,16 @@ const String createTableEntryTag =
             UNIQUE(${EntryContract.idColumn}, ${TagContract.tagIdColumn})
           );
           ''';
+
+const String createTableLogger =
+'''CREATE TABLE IF NOT EXISTS ${LogContract.table} (
+            ${LogContract.idColumn} INTEGER PRIMARY KEY,
+            ${LogContract.debugColumn} TEXT,
+            ${LogContract.exceptionColumn} TEXT,
+            ${LogContract.stackColumn} TEXT,
+            ${LogContract.dateColumn} INTEGER NOT NULL,
+            ${LogContract.levelColumn} INTEGER NOT NULL
+          );''';
 
 ///So that the LIKE operator in SQL is case sensitive.
 const String pragmaCaseInsensitive = '''PRAGMA case_sensitive_like = TRUE''';
