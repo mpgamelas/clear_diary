@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-class DiaryEntry extends StatefulWidget {
+class DiaryEntry extends StatelessWidget {
   static const String id = 'diary_entry_screen';
 
   final EntryModel entry;
@@ -17,20 +17,15 @@ class DiaryEntry extends StatefulWidget {
   DiaryEntry(this.entry);
 
   @override
-  _DiaryEntryState createState() => _DiaryEntryState();
-}
-
-class _DiaryEntryState extends State<DiaryEntry> {
-  @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text(widget.entry.isRecorded()
+          title: Text(entry.isRecorded()
               ? Strings.updateEntry
               : Strings.newEntry),
         ),
-        body: DiaryEntryBody(widget.entry),
+        body: DiaryEntryBody(entry),
       ),
     );
   }
