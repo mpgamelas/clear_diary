@@ -1,4 +1,4 @@
-import 'package:clear_diary/database/tag_contract.dart';
+import 'package:clear_diary/database/contract/tag_contract.dart';
 import 'package:clear_diary/models/tag_model.dart';
 import 'package:clear_diary/values/strings.dart';
 import 'package:flutter/material.dart';

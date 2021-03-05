@@ -3,7 +3,7 @@ import 'package:clear_diary/models/tag_model.dart';
 import 'package:clear_diary/values/strings.dart';
 import 'package:clear_diary/widgets/entry_card.dart';
 import 'package:clear_diary/widgets/tag_selector.dart';
-import 'package:clear_diary/database/entry_contract.dart';
+import 'file:///L:/MarioProjetos/Flutter/clear_diary/lib/database/contract/entry_contract.dart';
 import 'package:flutter/material.dart';
 
 class SearchEntry extends StatelessWidget {

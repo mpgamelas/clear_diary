@@ -1,4 +1,4 @@
-import 'package:clear_diary/database/tag_contract.dart';
+import 'package:clear_diary/database/contract/tag_contract.dart';
 import 'package:flutter_tagging/flutter_tagging.dart' as Tagging;
 
 class TagModel extends Tagging.Taggable {

@@ -1,4 +1,4 @@
-import 'package:clear_diary/database/entry_contract.dart';
+import 'file:///L:/MarioProjetos/Flutter/clear_diary/lib/database/contract/entry_contract.dart';
 import 'package:clear_diary/models/tag_model.dart';
 
 class EntryModel {

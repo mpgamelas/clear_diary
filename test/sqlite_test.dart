@@ -1,9 +1,9 @@
 import 'dart:io';
 
+import 'package:clear_diary/database/contract/entry_contract.dart';
+import 'package:clear_diary/database/contract/entry_tag_contract.dart';
+import 'package:clear_diary/database/contract/tag_contract.dart';
 import 'package:clear_diary/database/database_scripts.dart';
-import 'package:clear_diary/database/entry_contract.dart';
-import 'package:clear_diary/database/entry_tag_contract.dart';
-import 'package:clear_diary/database/tag_contract.dart';
 import 'package:clear_diary/models/entry_model.dart';
 import 'package:clear_diary/models/tag_model.dart';
 import 'package:sqflite/sqflite.dart';
@@ -130,7 +130,7 @@ void addRemoveTag(Database dbTest) async {
   expect(queryResults[0].tag, tagTest.tag);
   expect(queryResults[0].tagId, 1);
 
-  cleanDatabase(dbTest);
+  await cleanDatabase(dbTest);
 }
 
 void addRemoveEntries(Database dbTest) async {
@@ -196,7 +196,7 @@ void addEntryAndUpdate(Database dbTest) async {
   expect(queryResults[1].tags.length, 2);
   expect(queryResults[2].tags.length, 1);
 
-  cleanDatabase(dbTest);
+  await cleanDatabase(dbTest);
 }
 
 void addEntryDeleteTag(Database dbTest) async {

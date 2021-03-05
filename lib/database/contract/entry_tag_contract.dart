@@ -1,8 +1,8 @@
-import 'package:clear_diary/database/entry_contract.dart';
-import 'package:clear_diary/database/tag_contract.dart';
+import 'package:clear_diary/database/contract/entry_contract.dart';
+import 'package:clear_diary/database/contract/tag_contract.dart';
 import 'package:sqflite/sqlite_api.dart';
 
-import 'database_instance.dart';
+import '../database_instance.dart';
 
 class EntryTagContract {
   static const entry_tag_table = 'entries_tags';

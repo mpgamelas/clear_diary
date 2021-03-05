@@ -1,5 +1,5 @@
 import 'package:clear_diary/database/database_instance.dart';
-import 'package:clear_diary/database/log_contract.dart';
+import 'file:///L:/MarioProjetos/Flutter/clear_diary/lib/database/contract/log_contract.dart';
 import 'package:clear_diary/models/log_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';

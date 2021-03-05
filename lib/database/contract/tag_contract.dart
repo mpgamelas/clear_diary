@@ -1,8 +1,9 @@
-import 'package:clear_diary/database/entry_tag_contract.dart';
+import 'package:clear_diary/database/contract/entry_tag_contract.dart';
 import 'package:clear_diary/models/tag_model.dart';
 import 'package:sqflite/sqlite_api.dart';
 
-import 'database_instance.dart';
+import '../database_instance.dart';
+
 
 class TagContract {
   static const tags_table = 'tags';
@@ -26,7 +27,7 @@ class TagContract {
           conflictAlgorithm: ConflictAlgorithm.ignore);
 
       //If the same tag tries to be inserted.
-      if (idTagUpserted == null || idTagUpserted < 0) {
+      if (idTagUpserted == null || idTagUpserted <= 0) {
         List<Map<String, dynamic>> queryMap = await db.query(tags_table,
             columns: [tagIdColumn, tagColumn],
             where: '$tagColumn LIKE ?',

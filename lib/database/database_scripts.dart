@@ -1,8 +1,9 @@
-import 'package:clear_diary/database/entry_tag_contract.dart';
-import 'package:clear_diary/database/log_contract.dart';
-import 'package:clear_diary/database/tag_contract.dart';
 
-import 'entry_contract.dart';
+import 'package:clear_diary/database/contract/entry_tag_contract.dart';
+import 'package:clear_diary/database/contract/log_contract.dart';
+import 'package:clear_diary/database/contract/tag_contract.dart';
+
+import 'contract/entry_contract.dart';
 
 ///Map with the scripts used for each schema version
 final Map<int, List<String>> migrationScripts = {

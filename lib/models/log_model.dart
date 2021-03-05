@@ -1,4 +1,4 @@
-import 'package:clear_diary/database/log_contract.dart';
+import 'file:///L:/MarioProjetos/Flutter/clear_diary/lib/database/contract/log_contract.dart';
 import 'package:clear_diary/logger.dart';
 
 class LogModel{

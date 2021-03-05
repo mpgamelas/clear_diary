@@ -1,9 +1,9 @@
-import 'package:clear_diary/database/entry_tag_contract.dart';
+import 'file:///L:/MarioProjetos/Flutter/clear_diary/lib/database/contract/entry_tag_contract.dart';
 import 'package:clear_diary/models/log_model.dart';
 import 'package:clear_diary/models/tag_model.dart';
 import 'package:sqflite/sqlite_api.dart';
 
-import 'database_instance.dart';
+import '../database_instance.dart';
 
 class LogContract {
   static const table = 'logger';
