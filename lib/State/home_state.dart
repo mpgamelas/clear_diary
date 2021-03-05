@@ -15,14 +15,14 @@ class HomeState with ChangeNotifier {
     this.queryEntries();
   }
 
-  ///Default query for entries in the current month to the last month of the year
+  ///Default query for entries in the past 10 days to the last month of the year
   void queryEntries() async {
     if (_dataQueryBegin == null || _dataQueryEnd == null) {
       DateTime now = DateTime.now();
-      DateTime currentMonthStart = DateTime(now.year, now.month);
+      DateTime tenDaysAgo = now.subtract(Duration(days: 10));
       DateTime currentYearEnd = DateTime(now.year, 12, 31, 11);
 
-      _dataQueryBegin = currentMonthStart;
+      _dataQueryBegin = tenDaysAgo;
       _dataQueryEnd = currentYearEnd;
     }
     _queryEntriesRange(_dataQueryBegin, _dataQueryEnd);

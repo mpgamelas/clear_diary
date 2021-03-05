@@ -46,6 +46,8 @@ class Strings {
   static const String searchForAnEntry = 'Search for an Entry';
   static const String Tag = 'Tag';
   static const String noResultsToShow = 'No results to show';
+  static const String dateOfEntry = 'Date of Entry';
+  static const String addFilter = 'Add Filter';
 
   //Entry Card strings
   static const String cardEntryDetails = 'Entry details:';

@@ -15,7 +15,7 @@ class SearchEntry extends StatelessWidget {
       appBar: AppBar(
         title: Text(Strings.searchForAnEntry),
       ),
-      body: SearchBody(),
+      body: SearchBodyNew(),
     );
   }
 }
@@ -93,5 +93,72 @@ class _SearchBodyState extends State<SearchBody> {
     setState(() {
       searchResults = entriesList;
     });
+  }
+}
+
+enum FilterType { title, body, date, tag }
+
+class SearchBodyNew extends StatefulWidget {
+  @override
+  _SearchBodyNewState createState() => _SearchBodyNewState();
+}
+
+class _SearchBodyNewState extends State<SearchBodyNew> {
+  FilterType chosenType = FilterType.body; //default value for filter
+  List<DropdownMenuItem<FilterType>> _dropDownMenuItems = [];
+  List<EntryModel> searchResults = [];
+
+  @override
+  void initState() {
+    super.initState();
+
+    _dropDownMenuItems = FilterType.values.map((filterType) {
+      var textFilter = '';
+      switch (filterType) {
+        case FilterType.title:
+          textFilter = Strings.entryTitle;
+          break;
+        case FilterType.body:
+          textFilter = Strings.entryText;
+          break;
+        case FilterType.date:
+          textFilter = Strings.dateOfEntry;
+          break;
+        case FilterType.tag:
+          textFilter = Strings.Tag;
+          break;
+      }
+
+      return DropdownMenuItem(value: filterType, child: new Text(textFilter));
+    }).toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        ListTile(
+          leading: GestureDetector(
+            child: Icon(Icons.add),
+            onTap: onTapAddFilter,
+          ),
+          title: Text(Strings.addFilter),
+          trailing: DropdownButton<FilterType>(
+            value: chosenType,
+            items: _dropDownMenuItems,
+            onChanged: (newValue) {
+              setState(() {
+                chosenType = newValue;
+              });
+            },
+          ),
+        ),
+        Divider(),
+      ],
+    );
+  }
+
+  void onTapAddFilter() {
+    print('Tapped plus');
   }
 }
